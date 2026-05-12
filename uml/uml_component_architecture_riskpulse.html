@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { margin: 0; background: #0f1923; font-family: Arial, sans-serif; }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 980 720" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="a1" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#7ec8e3"/>
+    </marker>
+    <marker id="a2" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#4caf50"/>
+    </marker>
+    <marker id="a3" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#ff9800"/>
+    </marker>
+  </defs>
+  <rect width="980" height="720" fill="#0f1923"/>
+
+  <!-- Title -->
+  <text x="490" y="26" text-anchor="middle" fill="#fff" font-size="15" font-weight="bold">Diagramme de Composants — Architecture RiskPulse</text>
+  <text x="490" y="44" text-anchor="middle" fill="#7ec8e3" font-size="11">Vue modulaire multi-couches — Tkinter + WinForms</text>
+
+  <!-- ═══ LAYER BANDS ═══ -->
+  <rect x="10" y="55" width="960" height="110" rx="5" fill="#0d1f2d" stroke="#1a3a5c" stroke-width="1.5"/>
+  <text x="20" y="72" fill="#7ec8e3" font-size="11" font-weight="bold">COUCHE INTERFACE</text>
+
+  <rect x="10" y="175" width="960" height="100" rx="5" fill="#0d2a1a" stroke="#1a4a2a" stroke-width="1.5"/>
+  <text x="20" y="192" fill="#4caf50" font-size="11" font-weight="bold">COUCHE LOGIQUE MÉTIER — RiskController</text>
+
+  <rect x="10" y="285" width="960" height="220" rx="5" fill="#1a160a" stroke="#3a3010" stroke-width="1.5"/>
+  <text x="20" y="302" fill="#ffc107" font-size="11" font-weight="bold">COUCHE IA — Moteurs Intelligents</text>
+
+  <rect x="10" y="515" width="960" height="105" rx="5" fill="#150a20" stroke="#3a1050" stroke-width="1.5"/>
+  <text x="20" y="532" fill="#ce93d8" font-size="11" font-weight="bold">COUCHE DONNÉES — Persistance Locale</text>
+
+  <!-- ═══════════════ INTERFACE LAYER ═══════════════ -->
+
+  <!-- Component box helper -->
+  <!-- Tkinter App -->
+  <rect x="30" y="78" width="140" height="70" rx="4" fill="#0a1520" stroke="#2E86C1" stroke-width="2"/>
+  <rect x="128" y="83" width="16" height="10" rx="1" fill="none" stroke="#2E86C1" stroke-width="1.5"/>
+  <line x1="124" y1="86" x2="128" y2="86" stroke="#2E86C1" stroke-width="1.5"/>
+  <line x1="124" y1="90" x2="128" y2="90" stroke="#2E86C1" stroke-width="1.5"/>
+  <text x="100" y="105" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Tkinter App</text>
+  <text x="100" y="120" text-anchor="middle" fill="#7ec8e3" font-size="9">AnalysisView</text>
+  <text x="100" y="132" text-anchor="middle" fill="#7ec8e3" font-size="9">DashboardView</text>
+  <text x="100" y="144" text-anchor="middle" fill="#7ec8e3" font-size="9">PropagView | TranslView</text>
+
+  <!-- WinForms App -->
+  <rect x="195" y="78" width="140" height="70" rx="4" fill="#0a1520" stroke="#2E86C1" stroke-width="2"/>
+  <rect x="293" y="83" width="16" height="10" rx="1" fill="none" stroke="#2E86C1" stroke-width="1.5"/>
+  <line x1="289" y1="86" x2="293" y2="86" stroke="#2E86C1" stroke-width="1.5"/>
+  <line x1="289" y1="90" x2="293" y2="90" stroke="#2E86C1" stroke-width="1.5"/>
+  <text x="265" y="105" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">WinForms App</text>
+  <text x="265" y="120" text-anchor="middle" fill="#7ec8e3" font-size="9">MainForm</text>
+  <text x="265" y="132" text-anchor="middle" fill="#7ec8e3" font-size="9">AnalysisForm</text>
+  <text x="265" y="144" text-anchor="middle" fill="#7ec8e3" font-size="9">DashboardForm</text>
+
+  <!-- Shared Config -->
+  <rect x="360" y="78" width="130" height="70" rx="4" fill="#1a1a0a" stroke="#ffc107" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="425" y="105" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Shared Config</text>
+  <text x="425" y="120" text-anchor="middle" fill="#ffd54f" font-size="9">shared_settings.json</text>
+  <text x="425" y="132" text-anchor="middle" fill="#ffd54f" font-size="9">Thème / Langue</text>
+  <text x="425" y="144" text-anchor="middle" fill="#ffd54f" font-size="9">Seuils IA</text>
+
+  <!-- Auth Module -->
+  <rect x="510" y="78" width="120" height="70" rx="4" fill="#0a1520" stroke="#9c27b0" stroke-width="1.5"/>
+  <text x="570" y="105" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Auth Module</text>
+  <text x="570" y="120" text-anchor="middle" fill="#ce93d8" font-size="9">Login / Register</text>
+  <text x="570" y="132" text-anchor="middle" fill="#ce93d8" font-size="9">Session Token</text>
+  <text x="570" y="144" text-anchor="middle" fill="#ce93d8" font-size="9">Profils Utilisateurs</text>
+
+  <!-- Demo Mode -->
+  <rect x="650" y="78" width="120" height="70" rx="4" fill="#1a100a" stroke="#ff9800" stroke-width="1.5"/>
+  <text x="710" y="105" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Demo Mode</text>
+  <text x="710" y="120" text-anchor="middle" fill="#ffcc80" font-size="9">5 scénarios prêts</text>
+  <text x="710" y="132" text-anchor="middle" fill="#ffcc80" font-size="9">Données simulées</text>
+  <text x="710" y="144" text-anchor="middle" fill="#ffcc80" font-size="9">Auto-play</text>
+
+  <!-- Export Module -->
+  <rect x="790" y="78" width="155" height="70" rx="4" fill="#0a1520" stroke="#2E86C1" stroke-width="1.5"/>
+  <text x="867" y="105" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Export Module</text>
+  <text x="867" y="120" text-anchor="middle" fill="#7ec8e3" font-size="9">PDF (ReportLab)</text>
+  <text x="867" y="132" text-anchor="middle" fill="#7ec8e3" font-size="9">CSV / JSON</text>
+  <text x="867" y="144" text-anchor="middle" fill="#7ec8e3" font-size="9">PNG (graphe)</text>
+
+  <!-- ═══════════════ MÉTIER LAYER ═══════════════ -->
+
+  <!-- RiskController central -->
+  <rect x="380" y="195" width="200" height="65" rx="4" fill="#0a2010" stroke="#4caf50" stroke-width="2.5"/>
+  <rect x="561" y="200" width="16" height="10" rx="1" fill="none" stroke="#4caf50" stroke-width="1.5"/>
+  <line x1="557" y1="203" x2="561" y2="203" stroke="#4caf50" stroke-width="1.5"/>
+  <line x1="557" y1="207" x2="561" y2="207" stroke="#4caf50" stroke-width="1.5"/>
+  <text x="480" y="220" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">RiskController</text>
+  <text x="480" y="235" text-anchor="middle" fill="#a5d6a7" font-size="9">Orchestration des 5 ruptures</text>
+  <text x="480" y="248" text-anchor="middle" fill="#a5d6a7" font-size="9">analyze() | propagate() | compare() | counterfactual()</text>
+
+  <!-- Arrows from interface to controller -->
+  <line x1="170" y1="148" x2="420" y2="195" stroke="#7ec8e3" stroke-width="1.5" marker-end="url(#a1)"/>
+  <line x1="265" y1="148" x2="450" y2="195" stroke="#7ec8e3" stroke-width="1.5" marker-end="url(#a1)"/>
+
+  <!-- ═══════════════ IA LAYER ═══════════════ -->
+
+  <!-- NLPEngine -->
+  <rect x="30" y="310" width="175" height="105" rx="4" fill="#1a1205" stroke="#ffc107" stroke-width="2"/>
+  <rect x="183" y="315" width="16" height="10" rx="1" fill="none" stroke="#ffc107" stroke-width="1.5"/>
+  <line x1="179" y1="318" x2="183" y2="318" stroke="#ffc107" stroke-width="1.5"/>
+  <line x1="179" y1="322" x2="183" y2="322" stroke="#ffc107" stroke-width="1.5"/>
+  <text x="117" y="335" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">NLP Engine ★</text>
+  <text x="117" y="350" text-anchor="middle" fill="#ffd54f" font-size="9">spaCy NER</text>
+  <text x="117" y="363" text-anchor="middle" fill="#ffd54f" font-size="9">Relation Extraction</text>
+  <text x="117" y="376" text-anchor="middle" fill="#ffd54f" font-size="9">Coref Resolution</text>
+  <text x="117" y="389" text-anchor="middle" fill="#ffd54f" font-size="9">NetworkX Graph Builder</text>
+  <text x="117" y="403" text-anchor="middle" fill="#ffd54f" font-size="9">PyVis Renderer</text>
+
+  <!-- IsolationForest -->
+  <rect x="230" y="310" width="165" height="105" rx="4" fill="#1a1205" stroke="#ffc107" stroke-width="2"/>
+  <rect x="373" y="315" width="16" height="10" rx="1" fill="none" stroke="#ffc107" stroke-width="1.5"/>
+  <line x1="369" y1="318" x2="373" y2="318" stroke="#ffc107" stroke-width="1.5"/>
+  <line x1="369" y1="322" x2="373" y2="322" stroke="#ffc107" stroke-width="1.5"/>
+  <text x="312" y="335" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Modèle A</text>
+  <text x="312" y="350" text-anchor="middle" fill="#ffd54f" font-size="9">IsolationForest</text>
+  <text x="312" y="363" text-anchor="middle" fill="#ffd54f" font-size="9">(scikit-learn)</text>
+  <text x="312" y="376" text-anchor="middle" fill="#ffd54f" font-size="9">Features: degré, fréq</text>
+  <text x="312" y="389" text-anchor="middle" fill="#ffd54f" font-size="9">centralité locale</text>
+  <text x="312" y="402" text-anchor="middle" fill="#ffd54f" font-size="9">→ Score par entité</text>
+
+  <!-- GNNModel -->
+  <rect x="420" y="310" width="170" height="105" rx="4" fill="#1a0808" stroke="#ef5350" stroke-width="2.5"/>
+  <rect x="568" y="315" width="16" height="10" rx="1" fill="none" stroke="#ef5350" stroke-width="1.5"/>
+  <line x1="564" y1="318" x2="568" y2="318" stroke="#ef5350" stroke-width="1.5"/>
+  <line x1="564" y1="322" x2="568" y2="322" stroke="#ef5350" stroke-width="1.5"/>
+  <text x="505" y="335" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Modèle B — GNN ★</text>
+  <text x="505" y="350" text-anchor="middle" fill="#ffcdd2" font-size="9">StellarGraph</text>
+  <text x="505" y="363" text-anchor="middle" fill="#ffcdd2" font-size="9">GraphSAGE architecture</text>
+  <text x="505" y="376" text-anchor="middle" fill="#ffcdd2" font-size="9">Agrégation voisinage</text>
+  <text x="505" y="389" text-anchor="middle" fill="#ffcdd2" font-size="9">→ Score structurel réseau</text>
+  <text x="505" y="402" text-anchor="middle" fill="#ffcdd2" font-size="9">+ CentralityAnalyzer ★</text>
+
+  <!-- PropagationEngine -->
+  <rect x="610" y="310" width="170" height="105" rx="4" fill="#1a0808" stroke="#ef5350" stroke-width="2.5"/>
+  <rect x="758" y="315" width="16" height="10" rx="1" fill="none" stroke="#ef5350" stroke-width="1.5"/>
+  <line x1="754" y1="318" x2="758" y2="318" stroke="#ef5350" stroke-width="1.5"/>
+  <line x1="754" y1="322" x2="758" y2="322" stroke="#ef5350" stroke-width="1.5"/>
+  <text x="695" y="335" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Propagation ★</text>
+  <text x="695" y="350" text-anchor="middle" fill="#ffcdd2" font-size="9">SIR Adapté Graphes</text>
+  <text x="695" y="363" text-anchor="middle" fill="#ffcdd2" font-size="9">Diffusion pondérée</text>
+  <text x="695" y="376" text-anchor="middle" fill="#ffcdd2" font-size="9">Heatmap temps réel</text>
+  <text x="695" y="389" text-anchor="middle" fill="#ffcdd2" font-size="9">→ Vague animée ★</text>
+  <text x="695" y="402" text-anchor="middle" fill="#ffcdd2" font-size="9">Counterfactual ★</text>
+
+  <!-- TranslationEngine -->
+  <rect x="800" y="310" width="155" height="105" rx="4" fill="#1a1205" stroke="#ffc107" stroke-width="2"/>
+  <rect x="933" y="315" width="16" height="10" rx="1" fill="none" stroke="#ffc107" stroke-width="1.5"/>
+  <line x1="929" y1="318" x2="933" y2="318" stroke="#ffc107" stroke-width="1.5"/>
+  <line x1="929" y1="322" x2="933" y2="322" stroke="#ffc107" stroke-width="1.5"/>
+  <text x="877" y="335" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Translation</text>
+  <text x="877" y="350" text-anchor="middle" fill="#ffd54f" font-size="9">faster-whisper tiny</text>
+  <text x="877" y="363" text-anchor="middle" fill="#ffd54f" font-size="9">75MB — 100% offline</text>
+  <text x="877" y="376" text-anchor="middle" fill="#ffd54f" font-size="9">AR / FR / EN / ES</text>
+  <text x="877" y="389" text-anchor="middle" fill="#ffd54f" font-size="9">Historique + notation</text>
+  <text x="877" y="402" text-anchor="middle" fill="#ffd54f" font-size="9">Export PDF traduit</text>
+
+  <!-- Arrows from controller to IA modules -->
+  <line x1="430" y1="260" x2="230" y2="310" stroke="#4caf50" stroke-width="1.5" marker-end="url(#a2)"/>
+  <line x1="455" y1="260" x2="370" y2="310" stroke="#4caf50" stroke-width="1.5" marker-end="url(#a2)"/>
+  <line x1="480" y1="260" x2="490" y2="310" stroke="#4caf50" stroke-width="1.5" marker-end="url(#a2)"/>
+  <line x1="510" y1="260" x2="660" y2="310" stroke="#4caf50" stroke-width="1.5" marker-end="url(#a2)"/>
+  <line x1="540" y1="260" x2="840" y2="310" stroke="#4caf50" stroke-width="1.5" marker-end="url(#a2)"/>
+
+  <!-- ═══════════════ DATA LAYER ═══════════════ -->
+
+  <!-- SQLite -->
+  <rect x="30" y="535" width="150" height="72" rx="4" fill="#120820" stroke="#9c27b0" stroke-width="2"/>
+  <ellipse cx="105" cy="548" rx="40" ry="10" fill="#4a148c" stroke="#9c27b0" stroke-width="1.5"/>
+  <text x="105" y="572" text-anchor="middle" fill="#ce93d8" font-size="10" font-weight="bold">SQLite3</text>
+  <text x="105" y="585" text-anchor="middle" fill="#ce93d8" font-size="9">Analyses, Historique</text>
+  <text x="105" y="597" text-anchor="middle" fill="#ce93d8" font-size="9">Utilisateurs, Profils</text>
+
+  <!-- JSON Files -->
+  <rect x="205" y="535" width="150" height="72" rx="4" fill="#120820" stroke="#9c27b0" stroke-width="2"/>
+  <text x="280" y="562" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">JSON / CSV</text>
+  <text x="280" y="578" text-anchor="middle" fill="#ce93d8" font-size="9">Graphes exportés</text>
+  <text x="280" y="591" text-anchor="middle" fill="#ce93d8" font-size="9">Configurations</text>
+  <text x="280" y="604" text-anchor="middle" fill="#ce93d8" font-size="9">Scénarios démo</text>
+
+  <!-- PDF Output -->
+  <rect x="380" y="535" width="150" height="72" rx="4" fill="#120820" stroke="#9c27b0" stroke-width="2"/>
+  <text x="455" y="562" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">PDF Reports</text>
+  <text x="455" y="578" text-anchor="middle" fill="#ce93d8" font-size="9">Rapports d'analyse</text>
+  <text x="455" y="591" text-anchor="middle" fill="#ce93d8" font-size="9">Traductions</text>
+  <text x="455" y="604" text-anchor="middle" fill="#ce93d8" font-size="9">ReportLab</text>
+
+  <!-- Model files -->
+  <rect x="555" y="535" width="150" height="72" rx="4" fill="#120820" stroke="#9c27b0" stroke-width="2"/>
+  <text x="630" y="562" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Modèles IA</text>
+  <text x="630" y="578" text-anchor="middle" fill="#ce93d8" font-size="9">model_IF.pkl</text>
+  <text x="630" y="591" text-anchor="middle" fill="#ce93d8" font-size="9">model_gnn.h5</text>
+  <text x="630" y="604" text-anchor="middle" fill="#ce93d8" font-size="9">whisper_tiny/</text>
+
+  <!-- spaCy models -->
+  <rect x="730" y="535" width="150" height="72" rx="4" fill="#120820" stroke="#9c27b0" stroke-width="2"/>
+  <text x="805" y="562" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">spaCy Models</text>
+  <text x="805" y="578" text-anchor="middle" fill="#ce93d8" font-size="9">fr_core_news_sm</text>
+  <text x="805" y="591" text-anchor="middle" fill="#ce93d8" font-size="9">en_core_web_sm</text>
+  <text x="805" y="604" text-anchor="middle" fill="#ce93d8" font-size="9">~100MB total</text>
+
+  <!-- Arrows from IA to data -->
+  <line x1="117" y1="415" x2="105" y2="535" stroke="#9c27b0" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#a1)"/>
+  <line x1="312" y1="415" x2="280" y2="535" stroke="#9c27b0" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#a1)"/>
+  <line x1="505" y1="415" x2="455" y2="535" stroke="#9c27b0" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#a1)"/>
+  <line x1="505" y1="415" x2="630" y2="535" stroke="#9c27b0" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#a1)"/>
+  <line x1="117" y1="415" x2="805" y2="535" stroke="#9c27b0" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#a1)"/>
+
+  <!-- Legend -->
+  <rect x="20" y="628" width="940" height="78" rx="4" fill="#0d1520" stroke="#333" stroke-width="1"/>
+  <text x="490" y="644" text-anchor="middle" fill="#7ec8e3" font-size="11" font-weight="bold">LÉGENDE DES COMPOSANTS</text>
+  <rect x="35" y="652" width="60" height="18" rx="2" fill="#1a0808" stroke="#ef5350" stroke-width="2"/>
+  <text x="65" y="665" text-anchor="middle" fill="#ffcdd2" font-size="9">Rupture ★</text>
+  <rect x="115" y="652" width="60" height="18" rx="2" fill="#1a1205" stroke="#ffc107" stroke-width="2"/>
+  <text x="145" y="665" text-anchor="middle" fill="#ffd54f" font-size="9">IA Standard</text>
+  <rect x="195" y="652" width="60" height="18" rx="2" fill="#0a1520" stroke="#2E86C1" stroke-width="2"/>
+  <text x="225" y="665" text-anchor="middle" fill="#7ec8e3" font-size="9">Interface</text>
+  <rect x="275" y="652" width="60" height="18" rx="2" fill="#120820" stroke="#9c27b0" stroke-width="2"/>
+  <text x="305" y="665" text-anchor="middle" fill="#ce93d8" font-size="9">Données</text>
+  <rect x="355" y="652" width="80" height="18" rx="2" fill="#0a2010" stroke="#4caf50" stroke-width="2"/>
+  <text x="395" y="665" text-anchor="middle" fill="#a5d6a7" font-size="9">Contrôleur</text>
+  <rect x="455" y="652" width="80" height="18" rx="2" fill="#1a100a" stroke="#ff9800" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="495" y="665" text-anchor="middle" fill="#ffcc80" font-size="9">Config partagée</text>
+  <text x="490" y="695" text-anchor="middle" fill="#aaa" font-size="9" font-style="italic">Tous les modules fonctionnent 100% OFFLINE — aucune dépendance réseau requise</text>
+</svg>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { margin: 0; background: #0f1923; font-family: 'Courier New', monospace; }
+  .title { fill: #fff; font-size: 15px; font-weight: bold; font-family: Arial; }
+  .subtitle { fill: #7ec8e3; font-size: 11px; font-family: Arial; }
+  .class-name { fill: #fff; font-size: 11px; font-weight: bold; }
+  .class-attr { fill: #ccc; font-size: 9.5px; }
+  .class-method { fill: #7ec8e3; font-size: 9.5px; }
+  .layer-label { fill: #7ec8e3; font-size: 11px; font-weight: bold; font-family: Arial; }
+  .rel-label { fill: #aaa; font-size: 9px; font-family: Arial; font-style: italic; }
+  .mult { fill: #ff9800; font-size: 9px; font-family: Arial; }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1020 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="assoc" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#7ec8e3"/>
+    </marker>
+    <marker id="comp" markerWidth="10" markerHeight="10" refX="0" refY="5" orient="auto">
+      <polygon points="0,5 4,0 8,5 4,10" fill="#2E86C1"/>
+    </marker>
+    <marker id="inherit" markerWidth="12" markerHeight="12" refX="0" refY="6" orient="auto">
+      <polygon points="0,6 10,0 10,12" fill="none" stroke="#4caf50" stroke-width="1.5"/>
+    </marker>
+    <marker id="dep" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#666"/>
+    </marker>
+  </defs>
+  <rect width="1020" height="900" fill="#0f1923"/>
+
+  <!-- Title -->
+  <text x="510" y="28" text-anchor="middle" class="title">Diagramme de Classes — RiskPulse</text>
+  <text x="510" y="46" text-anchor="middle" class="subtitle">Architecture Orientée Objet — 4 Couches</text>
+
+  <!-- ═══ HELPER: draw a class box ═══ -->
+  <!-- Layer labels -->
+  <text x="15" y="120" class="layer-label" transform="rotate(-90, 15, 120)">INTERFACE</text>
+  <text x="15" y="310" class="layer-label" transform="rotate(-90, 15, 310)">MÉTIER</text>
+  <text x="15" y="560" class="layer-label" transform="rotate(-90, 15, 560)">IA</text>
+  <text x="15" y="800" class="layer-label" transform="rotate(-90, 15, 800)">DONNÉES</text>
+
+  <!-- Layer bands -->
+  <rect x="30" y="60" width="980" height="120" rx="4" fill="#0d1f2d" stroke="#1a3a5c" stroke-width="1" opacity="0.6"/>
+  <rect x="30" y="190" width="980" height="180" rx="4" fill="#0d2a1a" stroke="#1a4a2a" stroke-width="1" opacity="0.6"/>
+  <rect x="30" y="380" width="980" height="340" rx="4" fill="#1a1a0d" stroke="#3a3a1a" stroke-width="1" opacity="0.6"/>
+  <rect x="30" y="730" width="980" height="140" rx="4" fill="#1a0d1a" stroke="#3a1a3a" stroke-width="1" opacity="0.6"/>
+
+  <!-- ═══════════ LAYER 1: INTERFACE ═══════════ -->
+
+  <!-- MainApp -->
+  <g>
+    <rect x="45" y="70" width="160" height="98" rx="4" fill="#0a1520" stroke="#2E86C1" stroke-width="2"/>
+    <rect x="45" y="70" width="160" height="22" rx="4" fill="#1F4E79"/>
+    <text x="125" y="85" text-anchor="middle" class="class-name">MainApp</text>
+    <line x1="45" y1="92" x2="205" y2="92" stroke="#2E86C1" stroke-width="1"/>
+    <text x="50" y="106" class="class-attr">- current_user: User</text>
+    <text x="50" y="118" class="class-attr">- active_view: str</text>
+    <line x1="45" y1="125" x2="205" y2="125" stroke="#2E86C1" stroke-width="1"/>
+    <text x="50" y="138" class="class-method">+ run()</text>
+    <text x="50" y="150" class="class-method">+ switch_view(view)</text>
+  </g>
+
+  <!-- AnalysisView -->
+  <g>
+    <rect x="240" y="70" width="175" height="110" rx="4" fill="#0a1520" stroke="#2E86C1" stroke-width="2"/>
+    <rect x="240" y="70" width="175" height="22" rx="4" fill="#1F4E79"/>
+    <text x="327" y="85" text-anchor="middle" class="class-name">AnalysisView</text>
+    <line x1="240" y1="92" x2="415" y2="92" stroke="#2E86C1" stroke-width="1"/>
+    <text x="245" y="106" class="class-attr">- text_input: TextArea</text>
+    <text x="245" y="118" class="class-attr">- graph_panel: GraphWidget</text>
+    <line x1="240" y1="125" x2="415" y2="125" stroke="#2E86C1" stroke-width="1"/>
+    <text x="245" y="138" class="class-method">+ load_text()</text>
+    <text x="245" y="150" class="class-method">+ display_graph(G)</text>
+    <text x="245" y="162" class="class-method">+ show_results(data)</text>
+  </g>
+
+  <!-- DashboardView -->
+  <g>
+    <rect x="450" y="70" width="175" height="110" rx="4" fill="#0a1520" stroke="#2E86C1" stroke-width="2"/>
+    <rect x="450" y="70" width="175" height="22" rx="4" fill="#1F4E79"/>
+    <text x="537" y="85" text-anchor="middle" class="class-name">DashboardView</text>
+    <line x1="450" y1="92" x2="625" y2="92" stroke="#2E86C1" stroke-width="1"/>
+    <text x="455" y="106" class="class-attr">- charts: List[Chart]</text>
+    <text x="455" y="118" class="class-attr">- metrics: Dict</text>
+    <line x1="450" y1="125" x2="625" y2="125" stroke="#2E86C1" stroke-width="1"/>
+    <text x="455" y="138" class="class-method">+ refresh()</text>
+    <text x="455" y="150" class="class-method">+ export_pdf()</text>
+    <text x="455" y="162" class="class-method">+ export_csv()</text>
+  </g>
+
+  <!-- TranslationView -->
+  <g>
+    <rect x="660" y="70" width="175" height="110" rx="4" fill="#0a1520" stroke="#2E86C1" stroke-width="2"/>
+    <rect x="660" y="70" width="175" height="22" rx="4" fill="#1F4E79"/>
+    <text x="747" y="85" text-anchor="middle" class="class-name">TranslationView</text>
+    <line x1="660" y1="92" x2="835" y2="92" stroke="#2E86C1" stroke-width="1"/>
+    <text x="665" y="106" class="class-attr">- source_lang: str</text>
+    <text x="665" y="118" class="class-attr">- target_lang: str</text>
+    <line x1="660" y1="125" x2="835" y2="125" stroke="#2E86C1" stroke-width="1"/>
+    <text x="665" y="138" class="class-method">+ translate(text)</text>
+    <text x="665" y="150" class="class-method">+ show_history()</text>
+    <text x="665" y="162" class="class-method">+ rate_quality(score)</text>
+  </g>
+
+  <!-- PropagationView -->
+  <g>
+    <rect x="870" y="70" width="130" height="110" rx="4" fill="#0a1520" stroke="#2E86C1" stroke-width="2"/>
+    <rect x="870" y="70" width="130" height="22" rx="4" fill="#1F4E79"/>
+    <text x="935" y="85" text-anchor="middle" class="class-name">PropagView</text>
+    <line x1="870" y1="92" x2="1000" y2="92" stroke="#2E86C1" stroke-width="1"/>
+    <text x="875" y="106" class="class-attr">- source_node: str</text>
+    <text x="875" y="118" class="class-attr">- intensity: float</text>
+    <line x1="870" y1="125" x2="1000" y2="125" stroke="#2E86C1" stroke-width="1"/>
+    <text x="875" y="138" class="class-method">+ animate()</text>
+    <text x="875" y="150" class="class-method">+ inject_risk()</text>
+    <text x="875" y="162" class="class-method">+ counterfactual()</text>
+  </g>
+
+  <!-- ═══════════ LAYER 2: MÉTIER ═══════════ -->
+
+  <!-- RiskController -->
+  <g>
+    <rect x="45" y="200" width="175" height="130" rx="4" fill="#0a1a0a" stroke="#4caf50" stroke-width="2"/>
+    <rect x="45" y="200" width="175" height="22" rx="4" fill="#1b5e20"/>
+    <text x="132" y="215" text-anchor="middle" class="class-name">RiskController</text>
+    <line x1="45" y1="222" x2="220" y2="222" stroke="#4caf50" stroke-width="1"/>
+    <text x="50" y="236" class="class-attr">- nlp_engine: NLPEngine</text>
+    <text x="50" y="248" class="class-attr">- graph_engine: GraphEngine</text>
+    <text x="50" y="260" class="class-attr">- ia_engine: IAEngine</text>
+    <line x1="45" y1="267" x2="220" y2="267" stroke="#4caf50" stroke-width="1"/>
+    <text x="50" y="280" class="class-method">+ analyze(text): Graph</text>
+    <text x="50" y="292" class="class-method">+ propagate(node, lvl)</text>
+    <text x="50" y="304" class="class-method">+ compare_models()</text>
+    <text x="50" y="316" class="class-method">+ counterfactual(edge)</text>
+  </g>
+
+  <!-- Entity -->
+  <g>
+    <rect x="255" y="200" width="165" height="130" rx="4" fill="#0a1a0a" stroke="#4caf50" stroke-width="2"/>
+    <rect x="255" y="200" width="165" height="22" rx="4" fill="#1b5e20"/>
+    <text x="337" y="215" text-anchor="middle" class="class-name">Entity</text>
+    <line x1="255" y1="222" x2="420" y2="222" stroke="#4caf50" stroke-width="1"/>
+    <text x="260" y="236" class="class-attr">- id: str</text>
+    <text x="260" y="248" class="class-attr">- name: str</text>
+    <text x="260" y="260" class="class-attr">- type: EntityType</text>
+    <text x="260" y="272" class="class-attr">- risk_score: float</text>
+    <text x="260" y="284" class="class-attr">- centrality: Dict</text>
+    <line x1="255" y1="291" x2="420" y2="291" stroke="#4caf50" stroke-width="1"/>
+    <text x="260" y="304" class="class-method">+ update_score(val)</text>
+    <text x="260" y="316" class="class-method">+ is_critical(): bool</text>
+  </g>
+
+  <!-- Relation -->
+  <g>
+    <rect x="455" y="200" width="165" height="120" rx="4" fill="#0a1a0a" stroke="#4caf50" stroke-width="2"/>
+    <rect x="455" y="200" width="165" height="22" rx="4" fill="#1b5e20"/>
+    <text x="537" y="215" text-anchor="middle" class="class-name">Relation</text>
+    <line x1="455" y1="222" x2="620" y2="222" stroke="#4caf50" stroke-width="1"/>
+    <text x="460" y="236" class="class-attr">- source: Entity</text>
+    <text x="460" y="248" class="class-attr">- target: Entity</text>
+    <text x="460" y="260" class="class-attr">- weight: float</text>
+    <text x="460" y="272" class="class-attr">- type: str</text>
+    <line x1="455" y1="279" x2="620" y2="279" stroke="#4caf50" stroke-width="1"/>
+    <text x="460" y="292" class="class-method">+ get_weight(): float</text>
+    <text x="460" y="304" class="class-method">+ is_active(): bool</text>
+  </g>
+
+  <!-- RiskGraph -->
+  <g>
+    <rect x="655" y="200" width="165" height="130" rx="4" fill="#0a1a0a" stroke="#4caf50" stroke-width="2"/>
+    <rect x="655" y="200" width="165" height="22" rx="4" fill="#1b5e20"/>
+    <text x="737" y="215" text-anchor="middle" class="class-name">RiskGraph</text>
+    <line x1="655" y1="222" x2="820" y2="222" stroke="#4caf50" stroke-width="1"/>
+    <text x="660" y="236" class="class-attr">- G: nx.DiGraph</text>
+    <text x="660" y="248" class="class-attr">- entities: List[Entity]</text>
+    <text x="660" y="260" class="class-attr">- relations: List[Relation]</text>
+    <line x1="655" y1="267" x2="820" y2="267" stroke="#4caf50" stroke-width="1"/>
+    <text x="660" y="280" class="class-method">+ add_entity(e)</text>
+    <text x="660" y="292" class="class-method">+ add_relation(r)</text>
+    <text x="660" y="304" class="class-method">+ get_critical_nodes()</text>
+    <text x="660" y="316" class="class-method">+ to_dict(): Dict</text>
+  </g>
+
+  <!-- ═══════════ LAYER 3: IA ═══════════ -->
+
+  <!-- NLPEngine -->
+  <g>
+    <rect x="45" y="395" width="180" height="145" rx="4" fill="#1a1a08" stroke="#ffc107" stroke-width="2"/>
+    <rect x="45" y="395" width="180" height="22" rx="4" fill="#5D4037"/>
+    <text x="135" y="410" text-anchor="middle" class="class-name">NLPEngine</text>
+    <line x1="45" y1="417" x2="225" y2="417" stroke="#ffc107" stroke-width="1"/>
+    <text x="50" y="431" class="class-attr">- model: spacy.Language</text>
+    <text x="50" y="443" class="class-attr">- lang: str</text>
+    <text x="50" y="455" class="class-attr">- coref_resolver</text>
+    <line x1="45" y1="462" x2="225" y2="462" stroke="#ffc107" stroke-width="1"/>
+    <text x="50" y="475" class="class-method">+ extract_entities(txt)</text>
+    <text x="50" y="487" class="class-method">+ extract_relations(txt)</text>
+    <text x="50" y="499" class="class-method">+ resolve_coref(txt)</text>
+    <text x="50" y="511" class="class-method">+ build_graph(): RiskGraph</text>
+  </g>
+
+  <!-- IsolationForestModel -->
+  <g>
+    <rect x="255" y="395" width="185" height="135" rx="4" fill="#1a1a08" stroke="#ffc107" stroke-width="2"/>
+    <rect x="255" y="395" width="185" height="22" rx="4" fill="#5D4037"/>
+    <text x="347" y="410" text-anchor="middle" class="class-name">IsolationForestModel</text>
+    <line x1="255" y1="417" x2="440" y2="417" stroke="#ffc107" stroke-width="1"/>
+    <text x="260" y="431" class="class-attr">- model: IsolationForest</text>
+    <text x="260" y="443" class="class-attr">- contamination: float</text>
+    <text x="260" y="455" class="class-attr">- features: List[str]</text>
+    <line x1="255" y1="462" x2="440" y2="462" stroke="#ffc107" stroke-width="1"/>
+    <text x="260" y="475" class="class-method">+ train(data)</text>
+    <text x="260" y="487" class="class-method">+ predict(entity): float</text>
+    <text x="260" y="499" class="class-method">+ get_metrics(): Dict</text>
+    <text x="260" y="511" class="class-method">+ explain(entity)</text>
+  </g>
+
+  <!-- GNNModel -->
+  <g>
+    <rect x="470" y="395" width="185" height="135" rx="4" fill="#1a0a08" stroke="#ef5350" stroke-width="2"/>
+    <rect x="470" y="395" width="185" height="22" rx="4" fill="#7f1d1d"/>
+    <text x="562" y="410" text-anchor="middle" class="class-name">GNNModel ★</text>
+    <line x1="470" y1="417" x2="655" y2="417" stroke="#ef5350" stroke-width="1"/>
+    <text x="475" y="431" class="class-attr">- model: StellarGraph</text>
+    <text x="475" y="443" class="class-attr">- n_layers: int</text>
+    <text x="475" y="455" class="class-attr">- embedding_dim: int</text>
+    <line x1="470" y1="462" x2="655" y2="462" stroke="#ef5350" stroke-width="1"/>
+    <text x="475" y="475" class="class-method">+ build(graph)</text>
+    <text x="475" y="487" class="class-method">+ train(epochs)</text>
+    <text x="475" y="499" class="class-method">+ predict_risk(G)</text>
+    <text x="475" y="511" class="class-method">+ compare(modelA)</text>
+  </g>
+
+  <!-- PropagationEngine -->
+  <g>
+    <rect x="685" y="395" width="180" height="145" rx="4" fill="#1a0a08" stroke="#ef5350" stroke-width="2"/>
+    <rect x="685" y="395" width="180" height="22" rx="4" fill="#7f1d1d"/>
+    <text x="775" y="410" text-anchor="middle" class="class-name">PropagEngine ★</text>
+    <line x1="685" y1="417" x2="865" y2="417" stroke="#ef5350" stroke-width="1"/>
+    <text x="690" y="431" class="class-attr">- graph: RiskGraph</text>
+    <text x="690" y="443" class="class-attr">- speed: float</text>
+    <text x="690" y="455" class="class-attr">- threshold: float</text>
+    <line x1="685" y1="462" x2="865" y2="462" stroke="#ef5350" stroke-width="1"/>
+    <text x="690" y="475" class="class-method">+ propagate(src, lvl)</text>
+    <text x="690" y="487" class="class-method">+ step(): Dict</text>
+    <text x="690" y="499" class="class-method">+ counterfactual(e)</text>
+    <text x="690" y="511" class="class-method">+ get_heatmap(): Dict</text>
+    <text x="690" y="523" class="class-method">+ has_converged(): bool</text>
+  </g>
+
+  <!-- TranslationEngine -->
+  <g>
+    <rect x="45" y="560" width="180" height="130" rx="4" fill="#1a1a08" stroke="#ffc107" stroke-width="2"/>
+    <rect x="45" y="560" width="180" height="22" rx="4" fill="#5D4037"/>
+    <text x="135" y="575" text-anchor="middle" class="class-name">TranslationEngine</text>
+    <line x1="45" y1="582" x2="225" y2="582" stroke="#ffc107" stroke-width="1"/>
+    <text x="50" y="596" class="class-attr">- whisper: WhisperModel</text>
+    <text x="50" y="608" class="class-attr">- supported: List[str]</text>
+    <line x1="45" y1="615" x2="225" y2="615" stroke="#ffc107" stroke-width="1"/>
+    <text x="50" y="628" class="class-method">+ translate(txt, lang)</text>
+    <text x="50" y="640" class="class-method">+ detect_lang(txt)</text>
+    <text x="50" y="652" class="class-method">+ get_history(): List</text>
+    <text x="50" y="664" class="class-method">+ rate(id, score)</text>
+  </g>
+
+  <!-- CentralityAnalyzer -->
+  <g>
+    <rect x="255" y="560" width="185" height="120" rx="4" fill="#1a0a08" stroke="#ef5350" stroke-width="2"/>
+    <rect x="255" y="560" width="185" height="22" rx="4" fill="#7f1d1d"/>
+    <text x="347" y="575" text-anchor="middle" class="class-name">CentralityAnalyzer ★</text>
+    <line x1="255" y1="582" x2="440" y2="582" stroke="#ef5350" stroke-width="1"/>
+    <text x="260" y="596" class="class-attr">- graph: RiskGraph</text>
+    <line x1="255" y1="603" x2="440" y2="603" stroke="#ef5350" stroke-width="1"/>
+    <text x="260" y="616" class="class-method">+ pagerank(): Dict</text>
+    <text x="260" y="628" class="class-method">+ betweenness(): Dict</text>
+    <text x="260" y="640" class="class-method">+ closeness(): Dict</text>
+    <text x="260" y="652" class="class-method">+ get_hidden_critical()</text>
+    <text x="260" y="664" class="class-method">+ composite_score()</text>
+  </g>
+
+  <!-- ═══════════ LAYER 4: DONNÉES ═══════════ -->
+
+  <!-- AnalysisRepository -->
+  <g>
+    <rect x="45" y="745" width="185" height="110" rx="4" fill="#150a20" stroke="#9c27b0" stroke-width="2"/>
+    <rect x="45" y="745" width="185" height="22" rx="4" fill="#4a148c"/>
+    <text x="137" y="760" text-anchor="middle" class="class-name">AnalysisRepository</text>
+    <line x1="45" y1="767" x2="230" y2="767" stroke="#9c27b0" stroke-width="1"/>
+    <text x="50" y="781" class="class-attr">- db: SQLite3</text>
+    <text x="50" y="793" class="class-attr">- path: str</text>
+    <line x1="45" y1="800" x2="230" y2="800" stroke="#9c27b0" stroke-width="1"/>
+    <text x="50" y="813" class="class-method">+ save(analysis)</text>
+    <text x="50" y="825" class="class-method">+ load(id): Analysis</text>
+    <text x="50" y="837" class="class-method">+ get_history(): List</text>
+  </g>
+
+  <!-- UserRepository -->
+  <g>
+    <rect x="260" y="745" width="175" height="110" rx="4" fill="#150a20" stroke="#9c27b0" stroke-width="2"/>
+    <rect x="260" y="745" width="175" height="22" rx="4" fill="#4a148c"/>
+    <text x="347" y="760" text-anchor="middle" class="class-name">UserRepository</text>
+    <line x1="260" y1="767" x2="435" y2="767" stroke="#9c27b0" stroke-width="1"/>
+    <text x="265" y="781" class="class-attr">- db: SQLite3</text>
+    <line x1="260" y1="788" x2="435" y2="788" stroke="#9c27b0" stroke-width="1"/>
+    <text x="265" y="801" class="class-method">+ create_user(u)</text>
+    <text x="265" y="813" class="class-method">+ authenticate(u,p)</text>
+    <text x="265" y="825" class="class-method">+ get_prefs(): Dict</text>
+  </g>
+
+  <!-- FileManager -->
+  <g>
+    <rect x="465" y="745" width="175" height="110" rx="4" fill="#150a20" stroke="#9c27b0" stroke-width="2"/>
+    <rect x="465" y="745" width="175" height="22" rx="4" fill="#4a148c"/>
+    <text x="552" y="760" text-anchor="middle" class="class-name">FileManager</text>
+    <line x1="465" y1="767" x2="640" y2="767" stroke="#9c27b0" stroke-width="1"/>
+    <text x="470" y="781" class="class-attr">- base_path: str</text>
+    <line x1="465" y1="788" x2="640" y2="788" stroke="#9c27b0" stroke-width="1"/>
+    <text x="470" y="801" class="class-method">+ import_txt(path)</text>
+    <text x="470" y="813" class="class-method">+ import_pdf(path)</text>
+    <text x="470" y="825" class="class-method">+ export_pdf(data)</text>
+    <text x="470" y="837" class="class-method">+ export_json(data)</text>
+  </g>
+
+  <!-- ═══════════ RELATIONS ═══════════ -->
+  <!-- MainApp → Views (composition) -->
+  <line x1="125" y1="168" x2="125" y2="200" stroke="#4caf50" stroke-width="1.5" marker-end="url(#assoc)"/>
+
+  <!-- RiskController → NLPEngine -->
+  <line x1="135" y1="330" x2="135" y2="395" stroke="#ffc107" stroke-width="1.5" marker-start="url(#comp)" marker-end="url(#assoc)"/>
+  <text x="140" y="368" class="rel-label">uses</text>
+
+  <!-- RiskController → GNNModel -->
+  <line x1="220" y1="300" x2="470" y2="430" stroke="#ef5350" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#assoc)"/>
+
+  <!-- RiskController → PropagEngine -->
+  <line x1="220" y1="310" x2="685" y2="430" stroke="#ef5350" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#assoc)"/>
+
+  <!-- NLPEngine → RiskGraph -->
+  <line x1="225" y1="440" x2="655" y2="290" stroke="#4caf50" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#assoc)"/>
+  <text x="390" y="355" class="rel-label">creates</text>
+
+  <!-- RiskGraph → Entity (composition) -->
+  <line x1="720" y1="330" x2="380" y2="330" stroke="#4caf50" stroke-width="1.5" marker-start="url(#comp)"/>
+  <text x="530" y="325" class="mult">1</text>
+  <text x="420" y="325" class="mult">*</text>
+
+  <!-- Entity → Relation -->
+  <line x1="420" y1="270" x2="455" y2="260" stroke="#4caf50" stroke-width="1.2" marker-end="url(#assoc)"/>
+
+  <!-- TranslationEngine → AnalysisRepository -->
+  <line x1="135" y1="690" x2="135" y2="745" stroke="#9c27b0" stroke-width="1.2" marker-end="url(#assoc)"/>
+
+  <!-- Legend -->
+  <rect x="670" y="565" width="340" height="125" rx="4" fill="#0d1520" stroke="#444" stroke-width="1"/>
+  <text x="840" y="583" text-anchor="middle" fill="#7ec8e3" font-size="11" font-weight="bold" font-family="Arial">LÉGENDE</text>
+  <line x1="685" y1="598" x2="715" y2="598" stroke="#4caf50" stroke-width="2"/>
+  <text x="722" y="602" fill="#ccc" font-size="9.5" font-family="Arial">Association / dépendance</text>
+  <polygon points="685,618 689,614 693,618 689,622" fill="#2E86C1"/>
+  <line x1="693" y1="618" x2="715" y2="618" stroke="#2E86C1" stroke-width="2"/>
+  <text x="722" y="622" fill="#ccc" font-size="9.5" font-family="Arial">Composition (contient)</text>
+  <line x1="685" y1="638" x2="715" y2="638" stroke="#666" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="722" y="642" fill="#ccc" font-size="9.5" font-family="Arial">Dépendance («uses»)</text>
+  <rect x="685" y="650" width="24" height="14" rx="2" fill="#1a0a08" stroke="#ef5350" stroke-width="1.5"/>
+  <text x="697" y="661" text-anchor="middle" fill="#ccc" font-size="9">★</text>
+  <text x="722" y="662" fill="#ef5350" font-size="9.5" font-family="Arial">Classe de rupture technologique</text>
+  <rect x="685" y="668" width="24" height="14" rx="2" fill="#150a20" stroke="#9c27b0" stroke-width="1.5"/>
+  <text x="722" y="679" fill="#ce93d8" font-size="9.5" font-family="Arial">Couche données (persistence)</text>
+</svg>
+</body>
+</html>

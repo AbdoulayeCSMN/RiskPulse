@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { margin: 0; background: #0f1923; font-family: Arial, sans-serif; }
+  svg text { font-family: Arial, sans-serif; }
+  .title { fill: #fff; font-size: 16px; font-weight: bold; }
+  .subtitle { fill: #7ec8e3; font-size: 11px; }
+  .actor-label { fill: #e0e0e0; font-size: 11px; }
+  .uc-text { fill: #fff; font-size: 10px; }
+  .boundary-label { fill: #7ec8e3; font-size: 12px; font-weight: bold; }
+  .section-label { fill: #aaa; font-size: 10px; font-style: italic; }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 960 680" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#7ec8e3"/>
+    </marker>
+    <marker id="arrow-gray" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#666"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#4caf50"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="680" fill="#0f1923"/>
+
+  <!-- Title -->
+  <text x="480" y="30" text-anchor="middle" class="title">Diagramme des Cas d'Utilisation — RiskPulse</text>
+  <text x="480" y="48" text-anchor="middle" class="subtitle">Use Case Diagram — Vue Fonctionnelle Complète</text>
+
+  <!-- System Boundary -->
+  <rect x="160" y="60" width="680" height="580" rx="8" fill="none" stroke="#2E86C1" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="480" y="80" text-anchor="middle" class="boundary-label">« système » RiskPulse Desktop</text>
+
+  <!-- ═══════════════ ACTORS ═══════════════ -->
+
+  <!-- Analyste -->
+  <ellipse cx="60" cy="200" rx="16" ry="16" fill="none" stroke="#7ec8e3" stroke-width="2"/>
+  <line x1="60" y1="216" x2="60" y2="260" stroke="#7ec8e3" stroke-width="2"/>
+  <line x1="30" y1="235" x2="90" y2="235" stroke="#7ec8e3" stroke-width="2"/>
+  <line x1="60" y1="260" x2="35" y2="290" stroke="#7ec8e3" stroke-width="2"/>
+  <line x1="60" y1="260" x2="85" y2="290" stroke="#7ec8e3" stroke-width="2"/>
+  <text x="60" y="310" text-anchor="middle" class="actor-label">Analyste</text>
+
+  <!-- Auditeur -->
+  <ellipse cx="60" cy="420" rx="16" ry="16" fill="none" stroke="#7ec8e3" stroke-width="2"/>
+  <line x1="60" y1="436" x2="60" y2="480" stroke="#7ec8e3" stroke-width="2"/>
+  <line x1="30" y1="455" x2="90" y2="455" stroke="#7ec8e3" stroke-width="2"/>
+  <line x1="60" y1="480" x2="35" y2="510" stroke="#7ec8e3" stroke-width="2"/>
+  <line x1="60" y1="480" x2="85" y2="510" stroke="#7ec8e3" stroke-width="2"/>
+  <text x="60" y="530" text-anchor="middle" class="actor-label">Auditeur</text>
+
+  <!-- Admin -->
+  <ellipse cx="910" cy="300" rx="16" ry="16" fill="none" stroke="#ff9800" stroke-width="2"/>
+  <line x1="910" y1="316" x2="910" y2="360" stroke="#ff9800" stroke-width="2"/>
+  <line x1="880" y1="335" x2="940" y2="335" stroke="#ff9800" stroke-width="2"/>
+  <line x1="910" y1="360" x2="885" y2="390" stroke="#ff9800" stroke-width="2"/>
+  <line x1="910" y1="360" x2="935" y2="390" stroke="#ff9800" stroke-width="2"/>
+  <text x="910" y="410" text-anchor="middle" class="actor-label" fill="#ff9800">Admin</text>
+
+  <!-- ═══════════════ USE CASES — Column 1 (Core) ═══════════════ -->
+  <!-- UC1 -->
+  <ellipse cx="310" cy="130" rx="100" ry="22" fill="#1a2e42" stroke="#2E86C1" stroke-width="1.5"/>
+  <text x="310" y="127" text-anchor="middle" class="uc-text">UC1 : S'authentifier</text>
+  <text x="310" y="139" text-anchor="middle" class="uc-text">/ Gérer profil</text>
+
+  <!-- UC2 -->
+  <ellipse cx="310" cy="200" rx="100" ry="22" fill="#1a2e42" stroke="#2E86C1" stroke-width="1.5"/>
+  <text x="310" y="197" text-anchor="middle" class="uc-text">UC2 : Importer</text>
+  <text x="310" y="209" text-anchor="middle" class="uc-text">un texte / fichier</text>
+
+  <!-- UC3 -->
+  <ellipse cx="310" cy="275" rx="100" ry="22" fill="#1a3a2a" stroke="#4caf50" stroke-width="2"/>
+  <text x="310" y="272" text-anchor="middle" class="uc-text" fill="#a5d6a7">UC3 : Extraire entités</text>
+  <text x="310" y="284" text-anchor="middle" class="uc-text" fill="#a5d6a7">et construire graphe ★</text>
+
+  <!-- UC4 -->
+  <ellipse cx="310" cy="350" rx="100" ry="22" fill="#1a3a2a" stroke="#4caf50" stroke-width="2"/>
+  <text x="310" y="347" text-anchor="middle" class="uc-text" fill="#a5d6a7">UC4 : Simuler</text>
+  <text x="310" y="359" text-anchor="middle" class="uc-text" fill="#a5d6a7">propagation risque ★</text>
+
+  <!-- UC5 -->
+  <ellipse cx="310" cy="425" rx="100" ry="22" fill="#1a3a2a" stroke="#4caf50" stroke-width="2"/>
+  <text x="310" y="422" text-anchor="middle" class="uc-text" fill="#a5d6a7">UC5 : Détecter nœuds</text>
+  <text x="310" y="434" text-anchor="middle" class="uc-text" fill="#a5d6a7">critiques cachés ★</text>
+
+  <!-- ═══════════════ USE CASES — Column 2 ═══════════════ -->
+
+  <!-- UC6 -->
+  <ellipse cx="560" cy="130" rx="100" ry="22" fill="#1a3a2a" stroke="#4caf50" stroke-width="2"/>
+  <text x="560" y="127" text-anchor="middle" class="uc-text" fill="#a5d6a7">UC6 : Comparer</text>
+  <text x="560" y="139" text-anchor="middle" class="uc-text" fill="#a5d6a7">Modèle A vs B ★</text>
+
+  <!-- UC7 -->
+  <ellipse cx="560" cy="205" rx="100" ry="22" fill="#1a3a2a" stroke="#4caf50" stroke-width="2"/>
+  <text x="560" y="202" text-anchor="middle" class="uc-text" fill="#a5d6a7">UC7 : Simuler</text>
+  <text x="560" y="214" text-anchor="middle" class="uc-text" fill="#a5d6a7">contrefactuels ★</text>
+
+  <!-- UC8 -->
+  <ellipse cx="560" cy="280" rx="100" ry="22" fill="#1a2e42" stroke="#2E86C1" stroke-width="1.5"/>
+  <text x="560" y="277" text-anchor="middle" class="uc-text">UC8 : Traduire</text>
+  <text x="560" y="289" text-anchor="middle" class="uc-text">rapports (AR/FR/EN/ES)</text>
+
+  <!-- UC9 -->
+  <ellipse cx="560" cy="355" rx="100" ry="22" fill="#1a2e42" stroke="#2E86C1" stroke-width="1.5"/>
+  <text x="560" y="352" text-anchor="middle" class="uc-text">UC9 : Consulter</text>
+  <text x="560" y="364" text-anchor="middle" class="uc-text">le Dashboard</text>
+
+  <!-- UC10 -->
+  <ellipse cx="560" cy="425" rx="100" ry="22" fill="#1a2e42" stroke="#2E86C1" stroke-width="1.5"/>
+  <text x="560" y="422" text-anchor="middle" class="uc-text">UC10 : Exporter</text>
+  <text x="560" y="434" text-anchor="middle" class="uc-text">rapport (PDF/CSV/JSON)</text>
+
+  <!-- UC11 Admin -->
+  <ellipse cx="760" cy="300" rx="100" ry="22" fill="#2a1a10" stroke="#ff9800" stroke-width="1.5"/>
+  <text x="760" y="297" text-anchor="middle" class="uc-text" fill="#ffcc80">UC11 : Gérer</text>
+  <text x="760" y="309" text-anchor="middle" class="uc-text" fill="#ffcc80">utilisateurs et config</text>
+
+  <!-- UC12 -->
+  <ellipse cx="310" cy="500" rx="100" ry="22" fill="#1a2e42" stroke="#2E86C1" stroke-width="1.5"/>
+  <text x="310" y="497" text-anchor="middle" class="uc-text">UC12 : Lancer mode</text>
+  <text x="310" y="509" text-anchor="middle" class="uc-text">démonstration</text>
+
+  <!-- UC13 -->
+  <ellipse cx="560" cy="500" rx="100" ry="22" fill="#1a2e42" stroke="#2E86C1" stroke-width="1.5"/>
+  <text x="560" y="497" text-anchor="middle" class="uc-text">UC13 : Paramétrer</text>
+  <text x="560" y="509" text-anchor="middle" class="uc-text">les modèles IA</text>
+
+  <!-- ═══════════════ ASSOCIATIONS — Analyste ═══════════════ -->
+  <line x1="76" y1="195" x2="210" y2="148" stroke="#7ec8e3" stroke-width="1.2"/>
+  <line x1="76" y1="200" x2="210" y2="200" stroke="#7ec8e3" stroke-width="1.2"/>
+  <line x1="76" y1="205" x2="210" y2="268" stroke="#7ec8e3" stroke-width="1.2"/>
+  <line x1="76" y1="210" x2="210" y2="340" stroke="#7ec8e3" stroke-width="1.2"/>
+  <line x1="76" y1="215" x2="210" y2="418" stroke="#7ec8e3" stroke-width="1.2"/>
+  <line x1="76" y1="220" x2="210" y2="495" stroke="#7ec8e3" stroke-width="1.2"/>
+  <line x1="76" y1="200" x2="460" y2="130" stroke="#7ec8e3" stroke-width="1.2"/>
+  <line x1="76" y1="200" x2="460" y2="205" stroke="#7ec8e3" stroke-width="1.2"/>
+  <line x1="76" y1="200" x2="460" y2="280" stroke="#7ec8e3" stroke-width="1.2"/>
+  <line x1="76" y1="200" x2="460" y2="355" stroke="#7ec8e3" stroke-width="1.2"/>
+  <line x1="76" y1="200" x2="460" y2="425" stroke="#7ec8e3" stroke-width="1.2"/>
+  <line x1="76" y1="200" x2="460" y2="500" stroke="#7ec8e3" stroke-width="1.2"/>
+
+  <!-- Auditeur -->
+  <line x1="76" y1="420" x2="460" y2="355" stroke="#7ec8e3" stroke-width="1.2" stroke-dasharray="4,2"/>
+  <line x1="76" y1="425" x2="460" y2="425" stroke="#7ec8e3" stroke-width="1.2" stroke-dasharray="4,2"/>
+
+  <!-- Admin -->
+  <line x1="894" y1="300" x2="860" y2="300" stroke="#ff9800" stroke-width="1.2"/>
+
+  <!-- include arrows -->
+  <line x1="310" y1="253" x2="310" y2="178" stroke="#666" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#arrow-gray)"/>
+  <text x="325" y="218" class="section-label">«include»</text>
+
+  <line x1="560" y1="378" x2="560" y2="303" stroke="#666" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#arrow-gray)"/>
+  <text x="575" y="345" class="section-label">«include»</text>
+
+  <!-- Legend -->
+  <rect x="170" y="570" width="550" height="68" rx="6" fill="#0d1f2d" stroke="#2E86C1" stroke-width="1"/>
+  <text x="440" y="588" text-anchor="middle" fill="#7ec8e3" font-size="11" font-weight="bold">LÉGENDE</text>
+  <ellipse cx="200" cy="600" rx="18" ry="10" fill="#1a3a2a" stroke="#4caf50" stroke-width="2"/>
+  <text x="225" y="604" fill="#a5d6a7" font-size="10">Rupture technologique ★</text>
+  <ellipse cx="390" cy="600" rx="18" ry="10" fill="#1a2e42" stroke="#2E86C1" stroke-width="1.5"/>
+  <text x="415" y="604" fill="#e0e0e0" font-size="10">Fonctionnalité standard</text>
+  <ellipse cx="570" cy="600" rx="18" ry="10" fill="#2a1a10" stroke="#ff9800" stroke-width="1.5"/>
+  <text x="595" y="604" fill="#ffcc80" font-size="10">Admin uniquement</text>
+  <line x1="188" y1="622" x2="220" y2="622" stroke="#7ec8e3" stroke-width="1.5"/>
+  <text x="228" y="626" fill="#e0e0e0" font-size="10">Analyste</text>
+  <line x1="320" y1="622" x2="352" y2="622" stroke="#7ec8e3" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="360" y="626" fill="#e0e0e0" font-size="10">Auditeur (lecture seule)</text>
+  <line x1="490" y1="622" x2="522" y2="622" stroke="#666" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="530" y="626" fill="#aaa" font-size="10">«include»</text>
+</svg>
+</body>
+</html>

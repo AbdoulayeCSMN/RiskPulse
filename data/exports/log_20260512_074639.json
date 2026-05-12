@@ -1,0 +1,37 @@
+[
+  {
+    "timestamp": "2026-05-12T07:31:38.810181",
+    "operation": "init",
+    "message": "RiskController initialisé — NLP: prêt"
+  },
+  {
+    "timestamp": "2026-05-12T07:31:49.556125",
+    "operation": "demo",
+    "message": "Chargement scénario : Crise Financière Fictive"
+  },
+  {
+    "timestamp": "2026-05-12T07:31:49.556125",
+    "operation": "analyze",
+    "message": "Analyse démarrée (989 caractères)"
+  },
+  {
+    "timestamp": "2026-05-12T07:31:49.881785",
+    "operation": "analyze",
+    "message": "Analyse terminée en 0.326s — 9 entités, 17 relations"
+  },
+  {
+    "timestamp": "2026-05-12T07:31:49.882775",
+    "operation": "propagation",
+    "message": "Propagation depuis 'fonds_alpha_capital' (intensité=0.9)"
+  },
+  {
+    "timestamp": "2026-05-12T07:31:57.560172",
+    "operation": "analyze",
+    "message": "Analyse démarrée (967 caractères)"
+  },
+  {
+    "timestamp": "2026-05-12T07:31:57.890331",
+    "operation": "analyze",
+    "message": "Analyse terminée en 0.33s — 9 entités, 17 relations"
+  }
+]

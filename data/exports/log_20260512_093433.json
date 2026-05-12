@@ -1,0 +1,27 @@
+[
+  {
+    "timestamp": "2026-05-12T09:13:59.259436",
+    "operation": "init",
+    "message": "RiskController initialisé — NLP: prêt"
+  },
+  {
+    "timestamp": "2026-05-12T09:16:28.338166",
+    "operation": "demo",
+    "message": "Chargement scénario : Chaîne d'Approvisionnement Sous Stress"
+  },
+  {
+    "timestamp": "2026-05-12T09:16:28.340950",
+    "operation": "analyze",
+    "message": "Analyse démarrée (766 caractères)"
+  },
+  {
+    "timestamp": "2026-05-12T09:16:28.881148",
+    "operation": "analyze",
+    "message": "Analyse terminée en 0.54s — 10 entités, 16 relations"
+  },
+  {
+    "timestamp": "2026-05-12T09:16:28.883756",
+    "operation": "propagation",
+    "message": "Propagation depuis 'fournisseur_principal_asiacomponents' (intensité=0.8)"
+  }
+]

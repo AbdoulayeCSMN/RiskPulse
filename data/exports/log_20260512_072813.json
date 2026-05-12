@@ -1,0 +1,37 @@
+[
+  {
+    "timestamp": "2026-05-12T07:15:53.414403",
+    "operation": "init",
+    "message": "RiskController initialisé — NLP: prêt"
+  },
+  {
+    "timestamp": "2026-05-12T07:16:46.933005",
+    "operation": "demo",
+    "message": "Chargement scénario : Réseau de Conformité Juridique"
+  },
+  {
+    "timestamp": "2026-05-12T07:16:46.933005",
+    "operation": "analyze",
+    "message": "Analyse démarrée (792 caractères)"
+  },
+  {
+    "timestamp": "2026-05-12T07:16:47.357980",
+    "operation": "analyze",
+    "message": "Analyse terminée en 0.424s — 10 entités, 17 relations"
+  },
+  {
+    "timestamp": "2026-05-12T07:16:47.357980",
+    "operation": "propagation",
+    "message": "Propagation depuis 'financecorp_international' (intensité=0.75)"
+  },
+  {
+    "timestamp": "2026-05-12T07:17:12.989630",
+    "operation": "analyze",
+    "message": "Analyse démarrée (770 caractères)"
+  },
+  {
+    "timestamp": "2026-05-12T07:17:13.313342",
+    "operation": "analyze",
+    "message": "Analyse terminée en 0.324s — 10 entités, 17 relations"
+  }
+]

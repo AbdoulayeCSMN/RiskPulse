@@ -1,0 +1,82 @@
+[
+  {
+    "timestamp": "2026-05-12T00:06:45.671098",
+    "operation": "init",
+    "message": "RiskController initialisé — NLP: prêt"
+  },
+  {
+    "timestamp": "2026-05-12T00:09:05.114601",
+    "operation": "demo",
+    "message": "Chargement scénario : Chaîne d'Approvisionnement Sous Stress"
+  },
+  {
+    "timestamp": "2026-05-12T00:09:05.114601",
+    "operation": "analyze",
+    "message": "Analyse démarrée (766 caractères)"
+  },
+  {
+    "timestamp": "2026-05-12T00:09:05.562526",
+    "operation": "analyze",
+    "message": "Analyse terminée en 0.448s — 10 entités, 16 relations"
+  },
+  {
+    "timestamp": "2026-05-12T00:09:05.563350",
+    "operation": "propagation",
+    "message": "Propagation depuis 'fournisseur_principal_asiacomponents' (intensité=0.8)"
+  },
+  {
+    "timestamp": "2026-05-12T00:11:34.297141",
+    "operation": "propagation",
+    "message": "Propagation depuis 'europe' (intensité=0.85)"
+  },
+  {
+    "timestamp": "2026-05-12T00:23:44.646887",
+    "operation": "analyze",
+    "message": "Analyse démarrée (82 caractères)"
+  },
+  {
+    "timestamp": "2026-05-12T00:24:12.542447",
+    "operation": "analyze",
+    "message": "Analyse démarrée (124 caractères)"
+  },
+  {
+    "timestamp": "2026-05-12T00:24:50.169708",
+    "operation": "analyze",
+    "message": "Analyse démarrée (184 caractères)"
+  },
+  {
+    "timestamp": "2026-05-12T00:24:58.654924",
+    "operation": "demo",
+    "message": "Chargement scénario : Réseau de Conformité Juridique"
+  },
+  {
+    "timestamp": "2026-05-12T00:24:58.654924",
+    "operation": "analyze",
+    "message": "Analyse démarrée (792 caractères)"
+  },
+  {
+    "timestamp": "2026-05-12T00:24:59.197956",
+    "operation": "analyze",
+    "message": "Analyse terminée en 0.543s — 10 entités, 17 relations"
+  },
+  {
+    "timestamp": "2026-05-12T00:24:59.197956",
+    "operation": "propagation",
+    "message": "Propagation depuis 'financecorp_international' (intensité=0.75)"
+  },
+  {
+    "timestamp": "2026-05-12T00:25:08.900512",
+    "operation": "analyze",
+    "message": "Analyse démarrée (770 caractères)"
+  },
+  {
+    "timestamp": "2026-05-12T00:25:09.166729",
+    "operation": "analyze",
+    "message": "Analyse terminée en 0.266s — 10 entités, 17 relations"
+  },
+  {
+    "timestamp": "2026-05-12T00:30:33.312407",
+    "operation": "analyze",
+    "message": "Analyse démarrée (185 caractères)"
+  }
+]
