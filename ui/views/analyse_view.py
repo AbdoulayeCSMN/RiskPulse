@@ -334,11 +334,12 @@ class AnalyseView(ThemedFrame):
                 f.lift()
             else:
                 f.lower()
+        # Bouton actif = variant primary, autres = secondary (Canvas-based, pas de fg)
         for t, b in self._tab_btns.items():
-            if t == tid:
-                b.configure(bg=self.c("accent_primary"), fg="#ffffff")
-            else:
-                b.configure(bg=self.c("bg_card"), fg=self.c("text_secondary"))
+            b._variant = "primary" if t == tid else "secondary"
+            b._hover = False
+            b._draw()
+        self._active_tab = tid
 
     # ── Interactions texte ────────────────────
 
