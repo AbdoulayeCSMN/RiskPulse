@@ -163,7 +163,13 @@ class IsolationForestModel:
             self.train(graph)
 
         X, node_ids = self._extract_features(graph)
-        X_scaled = self.scaler.transform(X)
+        # Si le scaler n'a pas pu etre fit (graphe trop petit), re-train
+        try:
+            X_scaled = self.scaler.transform(X)
+        except Exception:
+            self.trained = False
+            self.train(graph)
+            X_scaled = self.scaler.transform(X)
 
         # scores_raw : valeurs négatives = anomalie chez sklearn
         scores_raw = self.model.decision_function(X_scaled)
@@ -466,13 +472,22 @@ class ModelComparator:
 
     def _compare(self) -> dict:
         """
-        Produit les métriques de comparaison entre les deux modèles.
-        Met en évidence les entités où les deux modèles DIVERGENT —
-        c'est là que se révèle le risque systémique.
+        Produit la matrice 2x2 entre les deux modèles :
+          - both_flag       : risque CONFIRME (validation croisee)
+          - only_b_flag     : risque SYSTEMIQUE CACHE (la valeur ajoutee)
+          - only_a_flag     : anomalie INDIVIDUELLE (potentiel bruit textuel)
+          - neither         : noeud normal
+
+        C'est cette matrice qui donne la valeur metier de la comparaison :
+        la case 'only_b_flag' contient ce qu'un humain et le ML classique
+        manqueraient — uniquement reperable par l'analyse structurelle.
         """
-        agreements = 0
-        divergences = []
-        only_b_risky = []   # B détecte un risque que A manque
+        both_flag    = []   # A oui ET B oui
+        only_a_flag  = []   # A oui ET B non  -> anomalie individuelle
+        only_b_flag  = []   # A non ET B oui  -> risque systemique cache
+        neither      = []   # A non ET B non
+        divergences  = []
+        agreements   = 0
 
         for node_id in self._results_a:
             res_a = self._results_a[node_id]
@@ -480,42 +495,79 @@ class ModelComparator:
             if not res_b:
                 continue
 
-            agree = res_a.is_anomaly == res_b.is_anomaly
-            if agree:
+            entry = {
+                "node_id":     node_id,
+                "node_name":   res_a.node_name,
+                "score_a":     round(res_a.score, 3),
+                "score_b":     round(res_b.score, 3),
+                "explanation": res_b.explanation,
+            }
+
+            if res_a.is_anomaly and res_b.is_anomaly:
+                both_flag.append(entry)
                 agreements += 1
+            elif res_a.is_anomaly and not res_b.is_anomaly:
+                only_a_flag.append(entry)
+                divergences.append({**entry, "delta": round(abs(res_b.score - res_a.score), 3),
+                                   "a_risky": True, "b_risky": False})
+            elif not res_a.is_anomaly and res_b.is_anomaly:
+                only_b_flag.append(entry)
+                divergences.append({**entry, "delta": round(abs(res_b.score - res_a.score), 3),
+                                   "a_risky": False, "b_risky": True})
             else:
-                delta = abs(res_b.score - res_a.score)
-                divergences.append({
-                    "node_id":   node_id,
-                    "node_name": res_a.node_name,
-                    "score_a":   round(res_a.score, 3),
-                    "score_b":   round(res_b.score, 3),
-                    "delta":     round(delta, 3),
-                    "a_risky":   res_a.is_anomaly,
-                    "b_risky":   res_b.is_anomaly,
-                })
-                # Cas critique : B détecte un risque que A manque
-                if res_b.is_anomaly and not res_a.is_anomaly:
-                    only_b_risky.append({
-                        "node_name":   res_b.node_name,
-                        "score_b":     round(res_b.score, 3),
-                        "explanation": res_b.explanation,
-                    })
+                neither.append(entry)
+                agreements += 1
 
         n = len(self._results_a)
         agreement_rate = round(agreements / n, 3) if n > 0 else 0
 
+        # Verdict global selon ce que la matrice revele
+        if only_b_flag:
+            verdict_label = "SYSTEMIC_RISK_DETECTED"
+            verdict_msg = (
+                f"Modele B revele {len(only_b_flag)} risque(s) systemique(s) "
+                f"invisible(s) au ML classique. Sans cette analyse structurelle, "
+                f"ces entites passeraient inapercues."
+            )
+        elif both_flag:
+            verdict_label = "RISK_CONFIRMED"
+            verdict_msg = (
+                f"{len(both_flag)} entite(s) flaguee(s) par les 2 modeles "
+                f"independants. Risque a forte confiance."
+            )
+        else:
+            verdict_label = "NO_SIGNIFICANT_RISK"
+            verdict_msg = "Aucun signal critique. Reseau dans la norme."
+
         return {
             "agreement_rate":  agreement_rate,
             "divergences":     sorted(divergences, key=lambda x: x["delta"], reverse=True),
-            "only_b_detects":  only_b_risky,  # La vraie rupture visible
+
+            # Matrice 2x2 - les 4 cases
+            "both_flag":       sorted(both_flag,   key=lambda x: -x["score_b"]),
+            "only_a_flag":     sorted(only_a_flag, key=lambda x: -x["score_a"]),
+            "only_b_flag":     sorted(only_b_flag, key=lambda x: -x["score_b"]),
+            "neither_count":   len(neither),
+
+            # Comptes pour la matrice
             "n_anomalies_a":   sum(1 for r in self._results_a.values() if r.is_anomaly),
             "n_anomalies_b":   sum(1 for r in self._results_b.values() if r.is_anomaly),
-            "key_insight": (
-                f"Modèle B détecte {len(only_b_risky)} entité(s) risquée(s) "
-                f"invisibles pour Modèle A — risque systémique révélé."
-            ) if only_b_risky else
-                "Les deux modèles convergent sur ce réseau.",
+            "n_both":          len(both_flag),
+            "n_only_a":        len(only_a_flag),
+            "n_only_b":        len(only_b_flag),
+            "n_neither":       len(neither),
+
+            # Verdict
+            "verdict_label":   verdict_label,
+            "verdict_msg":     verdict_msg,
+
+            # Compat backward
+            "only_b_detects":  [
+                {"node_name": e["node_name"], "score_b": e["score_b"],
+                 "explanation": e["explanation"]}
+                for e in only_b_flag
+            ],
+            "key_insight": verdict_msg,
         }
 
     def get_results_for_node(self, node_id: str) -> Tuple[Optional[PredictionResult], Optional[PredictionResult]]:

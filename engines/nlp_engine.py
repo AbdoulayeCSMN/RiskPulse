@@ -228,15 +228,77 @@ class NLPEngine:
             # 2. Relations par co-occurrence dans la même phrase
             self._add_cooccurrence_relations(ents_in_sent, str(sent))
 
+    # ── Stop-words pour la NER (mots à exclure même si spaCy les détecte) ──
+    _NER_STOPWORDS = {
+        # Articles, déterminants, prépositions FR
+        "un", "une", "des", "le", "la", "les", "l", "du", "de", "d",
+        "ce", "cette", "ces", "son", "sa", "ses", "leur", "leurs",
+        "dans", "sur", "sous", "vers", "chez", "avec", "sans", "pour",
+        "par", "entre", "depuis", "pendant", "selon", "via",
+        # Articles, déterminants, prépositions EN
+        "a", "an", "the", "this", "that", "these", "those",
+        "in", "on", "at", "to", "for", "with", "from", "of", "by",
+        # Verbes auxiliaires fréquents qui apparaissent comme entités
+        "est", "sont", "ont", "fait", "is", "are", "was", "were",
+        # Devises seules (souvent extraites à part du montant)
+        "mad", "dh", "eur", "usd", "gbp", "cad", "jpy", "chf", "dollar",
+        "dollars", "euro", "euros", "dirham", "dirhams",
+        # Adverbes / quantifieurs
+        "tout", "tous", "toute", "toutes", "plus", "moins", "autant",
+        "très", "peu", "beaucoup", "bien", "mal",
+        # Mots vagues
+        "société", "groupe", "entreprise", "personne", "individu",
+        "structure", "structures", "acteur", "acteurs", "opérations",
+        "operation", "operations", "company", "group", "firm",
+    }
+
+    # Mots qui à eux seuls ne forment pas une entité (besoin de + de contexte)
+    _NER_INVALID_SINGLE = {
+        "fonds", "banque", "directeur", "président", "ministre",
+        "fund", "bank", "director", "president", "ceo", "cfo",
+    }
+
     def _is_valid_entity(self, name: str, label: str) -> bool:
-        """Filtre les entités non pertinentes (trop courtes, nombres purs…)."""
+        """
+        Filtre robuste : ne garde que les entités à valeur de risque.
+        Vire bruit, prépositions, devises seules, montants en double, etc.
+        """
         name = name.strip()
-        if len(name) < 2:
+        clean = re.sub(r'^(la |le |les |l\'|un |une |des |the |a |an )',
+                        '', name, flags=re.IGNORECASE).strip()
+
+        # 1) Longueur minimale (3 caractères pour éviter "un", "le", "à")
+        if len(clean) < 3:
             return False
-        if name.isdigit():
+
+        # 2) Tout chiffres ou ponctuation seuls
+        if re.fullmatch(r"[\d\s.,'\"€$£%-]+", clean):
             return False
-        if label in ("CARDINAL", "ORDINAL", "QUANTITY", "DATE", "TIME"):
+
+        # 3) Stop-words explicites
+        lower = clean.lower()
+        if lower in self._NER_STOPWORDS:
             return False
+
+        # 4) Mots seuls qui ne sont pas des entités sans contexte
+        if " " not in clean and lower in self._NER_INVALID_SINGLE:
+            return False
+
+        # 5) Labels spaCy à virer
+        # MONEY / PERCENT / QUANTITY : on les capture via regex dédié (montants
+        # avec contexte), sinon ils créent des doublons "500 Millions", "Mad", etc.
+        if label in ("CARDINAL", "ORDINAL", "QUANTITY", "DATE", "TIME",
+                     "PERCENT", "MONEY"):
+            return False
+
+        # 6) Une entité d'un seul mot en minuscules (souvent erreur de NER)
+        if " " not in clean and clean.islower() and not clean.istitle():
+            return False
+
+        # 7) Les "MISC" trop courts (souvent du bruit)
+        if label == "MISC" and len(clean) < 5:
+            return False
+
         return True
 
     def _register_entity(self, name: str, label: str, sentence: str) -> Entity:
@@ -336,15 +398,22 @@ class NLPEngine:
         for sentence in sentences:
             ents_in_sent = []
 
-            # Montants
-            for match in re.finditer(r'\d+[\s,.]?\d*\s*(€|\$|MAD|DH|million|milliard|k€|M€)', sentence):
-                eid = self._register_entity(match.group(), "MONEY", sentence).id
-                ents_in_sent.append(eid)
-
-            # Mots ou groupes en majuscule (heuristique organisations/personnes)
-            for match in re.finditer(r'\b([A-ZÁÀÂÉÈÊÎÏÔÙÛÜÇŒÆ][a-záàâéèêîïôùûüçœæ]+(?:\s[A-ZÁÀÂÉÈÊÎÏÔÙÛÜÇŒÆ][a-záàâéèêîïôùûüçœæ]+)*)\b', sentence):
+            # Mots ou groupes en majuscule (heuristique organisations/personnes).
+            # On NE crée PLUS d'entités MONEY : elles polluent le graphe avec
+            # des "500 Millions" / "Mad". Les montants sont contextuels, ils
+            # n'ont pas de relations métier en propre.
+            STOP_CAPS = {
+                "Les", "Des", "Une", "Un", "Dans", "Sur", "Avec", "Pour", "Par",
+                "Le", "La", "L", "Du", "De", "Et", "Ou",
+                "The", "This", "That", "Their", "These", "Those", "When", "Where",
+                "Mad", "Dh", "Eur", "Usd", "Million", "Millions", "Milliard", "Milliards",
+            }
+            for match in re.finditer(
+                r'\b([A-ZÁÀÂÉÈÊÎÏÔÙÛÜÇŒÆ][a-záàâéèêîïôùûüçœæ]+(?:\s[A-ZÁÀÂÉÈÊÎÏÔÙÛÜÇŒÆ][a-záàâéèêîïôùûüçœæ]+)*)\b',
+                sentence,
+            ):
                 name = match.group()
-                if len(name) > 3 and name not in ("Les", "Des", "Une", "The", "This", "That"):
+                if len(name) > 3 and name not in STOP_CAPS:
                     eid = self._register_entity(name, "ORG", sentence).id
                     ents_in_sent.append(eid)
 

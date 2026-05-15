@@ -211,17 +211,69 @@ class RiskController:
         # ── Étape 4 : Initialisation propagation ──
         self.propagation_engine = PropagationEngine(self.current_graph)
 
+        # ── Étape 5 : Risk Intelligence (scoring + crises + cascades) ──
+        from engines.risk_intelligence import (
+            RiskScorer, CrisisMatcher, CascadeEstimator,
+        )
+        # Prepare un dict entites avec phrases pour le sentiment scoring
+        ent_for_scoring = {}
+        for e in nlp_result["entities"]:
+            ent_for_scoring[e["id"]] = {
+                "name": e.get("name"),
+                "sentences": e.get("sentences", []),
+            }
+        scorer = RiskScorer(self.current_graph, ent_for_scoring)
+        risk_profiles = [r.to_dict() for r in scorer.analyze()]
+
+        matcher = CrisisMatcher(self.current_graph)
+        crisis_matches = matcher.match()[:3]   # top 3 patterns
+
+        estimator = CascadeEstimator(self.current_graph, ent_for_scoring)
+        cascade_top = [c.to_dict() for c in estimator.estimate_top_risks(top_n=3)]
+
+        risk_intel = {
+            "profiles":       risk_profiles,
+            "crisis_matches": crisis_matches,
+            "cascades":       cascade_top,
+            "topology":       matcher.signature(),
+        }
+
+        # ── Banking Pack (AML / KYC) ──
+        # Toujours calcule : meme si non-banking, les flags peuvent etre utiles.
+        # On utilise l'analyse partielle (nlp + entities). On va aussi feed risk_intel.
+        partial_analysis = {
+            "nlp": nlp_result,
+            "risk_intel": risk_intel,
+        }
+        try:
+            from engines.banking_pack import BankingAnalyzer
+            banking = BankingAnalyzer(partial_analysis, source_text=text).analyze()
+        except Exception as e:
+            logger.warning(f"Banking analysis failed: {e}")
+            banking = {}
+
         total_time = round(time.time() - start, 3)
 
         self.current_analysis = {
-            "timestamp":   datetime.now().isoformat(),
-            "nlp":         nlp_result,
-            "centrality":  centrality_result,
-            "comparison":  comparison_result,
-            "stats":       nlp_result["stats"],
-            "total_time":  total_time,
-            "text_length": len(text),
+            "timestamp":      datetime.now().isoformat(),
+            "nlp":            nlp_result,
+            "centrality":     centrality_result,
+            "comparison":     comparison_result,
+            "risk_intel":     risk_intel,
+            "banking":        banking,
+            "stats":          nlp_result["stats"],
+            "total_time":     total_time,
+            "text_length":    len(text),
         }
+
+        # ── Étape 6 : Persistance Knowledge Base ──
+        try:
+            from services.knowledge_base import get_kb
+            kb = get_kb()
+            analysis_id = kb.save_analysis(self.current_analysis, text)
+            self.current_analysis["kb_id"] = analysis_id
+        except Exception as e:
+            logger.warning(f"KB save failed: {e}")
 
         self._log("analyze", f"Analyse terminée en {total_time}s — "
                              f"{nlp_result['stats'].get('nb_entities', 0)} entités, "
