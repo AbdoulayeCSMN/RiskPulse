@@ -73,6 +73,7 @@ class Entity:
     frequency: int = 1
     risk_score: float = 0.0
     mentions: List[str] = field(default_factory=list)
+    sentences: List[str] = field(default_factory=list)   # phrases d'apparition
 
     @property
     def color(self) -> str:
@@ -87,6 +88,8 @@ class Entity:
             "frequency": self.frequency,
             "risk_score": self.risk_score,
             "color": self.color,
+            "sentences": self.sentences,
+            "mentions": self.mentions,
         }
 
 
@@ -144,10 +147,26 @@ class NLPEngine:
         """
         Charge le modèle spaCy.
         Retourne True si succès, False si le modèle n'est pas installé.
+
+        Strategie de chargement :
+          1. Import direct du module modele (fr_core_news_sm.load())
+             -> robuste en mode frozen / packagé.
+          2. Fallback : spacy.load() classique (resolution par nom).
         """
+        model_name = self.SPACY_MODELS.get(self.language, "en_core_web_sm")
+        # Methode 1 : import direct (frozen-friendly)
+        try:
+            import importlib
+            mod = importlib.import_module(model_name)
+            self._nlp = mod.load()
+            logger.info(f"Modèle spaCy chargé (direct) : {model_name}")
+            return True
+        except Exception as e:
+            logger.debug(f"Import direct {model_name} echec : {e}")
+
+        # Methode 2 : spacy.load classique (resolution par entry_points)
         try:
             import spacy
-            model_name = self.SPACY_MODELS.get(self.language, "en_core_web_sm")
             self._nlp = spacy.load(model_name)
             logger.info(f"Modèle spaCy chargé : {model_name}")
             return True
@@ -155,7 +174,7 @@ class NLPEngine:
             logger.warning("spaCy non installé — mode fallback regex activé")
             return False
         except OSError:
-            logger.warning(f"Modèle spaCy non trouvé — mode fallback regex activé")
+            logger.warning(f"Modèle spaCy '{model_name}' non trouvé — fallback regex")
             return False
 
     def is_ready(self) -> bool:
@@ -301,17 +320,67 @@ class NLPEngine:
 
         return True
 
+    # Suffixes corporate qui forcent la classification "Organisation"
+    # meme si spaCy a classe en PER / MISC
+    _CORP_SUFFIXES = {
+        "ag", "sa", "sarl", "sas", "inc", "corp", "corporation",
+        "ltd", "llc", "gmbh", "spa", "plc", "bv", "nv", "kg",
+        "capital", "holding", "holdings", "group", "groupe",
+        "international", "partners", "trust", "fund", "fonds",
+        "bank", "banque", "trading", "ventures", "industries",
+        "research", "consulting", "securities",
+    }
+
+    # Indicateurs PEP : si la phrase contient un de ces titres avant un nom,
+    # on flag PERSON quoi qu'il arrive (pour eviter "ministre Mohammed Tazi"
+    # classe comme MISC parce que spaCy a mal compris)
+    _PERSON_TITLES = {
+        "ministre", "minister", "president", "président", "presidente",
+        "directeur", "director", "pdg", "ceo", "cfo", "coo",
+        "ambassadeur", "ambassador", "gouverneur", "governor",
+        "senateur", "senator", "depute", "député", "deputy",
+        "premier ministre", "prime minister", "chancellor",
+        "general", "général", "amiral", "admiral",
+    }
+
+    def _smart_classify(self, name: str, label: str, sentence: str) -> str:
+        """
+        Post-process la classification spaCy via heuristiques :
+          - Suffixe corporate (AG / SA / Capital / Bank...) -> ORG
+          - Titre PEP juste avant le nom dans la phrase -> PER
+          - Sinon, label spaCy d'origine
+        """
+        name_low = name.lower()
+        tokens = name_low.split()
+        # Suffixe corporate
+        if any(t in self._CORP_SUFFIXES for t in tokens):
+            return "ORG"
+        # Titre PEP dans la phrase pointe sur cette personne
+        sent_low = (sentence or "").lower()
+        for title in self._PERSON_TITLES:
+            if f"{title} {name_low}" in sent_low or f"{title.title()} {name}" in (sentence or ""):
+                return "PER"
+        return label
+
     def _register_entity(self, name: str, label: str, sentence: str) -> Entity:
         """Enregistre ou met à jour une entité (résolution de coréférence simple)."""
+        # Smart classification (override eventuel du label spaCy)
+        label = self._smart_classify(name, label, sentence)
+
         # Normalisation du nom
         normalized = self._normalize_name(name)
         entity_id = self._make_id(normalized)
+
+        # Phrase nettoyee (limite a 300 chars pour eviter d'exploser la KB)
+        clean_sent = (sentence or "").strip()[:300]
 
         # Recherche d'une entité existante similaire
         existing_id = self._find_similar_entity(normalized)
         if existing_id:
             self.entities[existing_id].frequency += 1
             self.entities[existing_id].mentions.append(name)
+            if clean_sent and clean_sent not in self.entities[existing_id].sentences:
+                self.entities[existing_id].sentences.append(clean_sent)
             return self.entities[existing_id]
 
         # Nouvelle entité
@@ -323,6 +392,7 @@ class NLPEngine:
             type_label=type_label,
             frequency=1,
             mentions=[name],
+            sentences=[clean_sent] if clean_sent else [],
         )
         self.entities[entity_id] = entity
         return entity

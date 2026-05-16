@@ -87,31 +87,36 @@ class WelcomeView(QWidget):
         outer.addSpacing(48)
 
         # ── Section "capabilities" ──
-        sec_lbl = QLabel(tr("CAPABILITIES"))
-        sec_lbl.setProperty("class", "caption")
-        outer.addWidget(sec_lbl)
+        self._caps_section_lbl = QLabel(tr("CAPABILITIES"))
+        self._caps_section_lbl.setProperty("class", "caption")
+        outer.addWidget(self._caps_section_lbl)
         outer.addSpacing(12)
 
         caps_grid = QGridLayout()
         caps_grid.setSpacing(16)
 
-        capabilities = [
-            ("01", tr("Knowledge graph extraction"),
-             tr("Entities and relations detected from raw text via NLP.")),
-            ("02", tr("Risk propagation"),
-             tr("SIR-adapted simulation across weighted graphs.")),
-            ("03", tr("Hidden critical nodes"),
-             tr("PageRank + Betweenness + Closeness composite scoring.")),
-            ("04", tr("Model comparison"),
-             tr("IsolationForest vs GraphBased anomaly detection.")),
-            ("05", tr("What-if simulations"),
-             tr("Add or remove links and measure the counterfactual impact.")),
-            ("06", tr("Multilingual translation"),
-             tr("Five languages with persistent translation history.")),
+        # Cles source (en anglais) -> on stocke pour pouvoir retranslate
+        self._capabilities_src = [
+            ("01", "Knowledge graph extraction",
+             "Entities and relations detected from raw text via NLP."),
+            ("02", "Risk propagation",
+             "SIR-adapted simulation across weighted graphs."),
+            ("03", "Hidden critical nodes",
+             "PageRank + Betweenness + Closeness composite scoring."),
+            ("04", "Model comparison",
+             "IsolationForest vs GraphBased anomaly detection."),
+            ("05", "What-if simulations",
+             "Add or remove links and measure the counterfactual impact."),
+            ("06", "Multilingual translation",
+             "Five languages with persistent translation history."),
         ]
-        for i, (num, name, desc) in enumerate(capabilities):
-            cap_card = self._build_capability_card(num, name, desc)
+        self._cap_widgets: list[tuple[QLabel, QLabel]] = []
+        for i, (num, name_src, desc_src) in enumerate(self._capabilities_src):
+            cap_card, name_lbl, desc_lbl = self._build_capability_card(
+                num, tr(name_src), tr(desc_src)
+            )
             caps_grid.addWidget(cap_card, i // 3, i % 3)
+            self._cap_widgets.append((name_lbl, desc_lbl))
 
         outer.addLayout(caps_grid)
         outer.addStretch(1)
@@ -133,7 +138,8 @@ class WelcomeView(QWidget):
         foot_row.addWidget(self._version_lbl)
         outer.addLayout(foot_row)
 
-    def _build_capability_card(self, num: str, name: str, desc: str) -> QFrame:
+    def _build_capability_card(self, num: str, name: str, desc: str):
+        """Retourne (frame, name_label, desc_label) pour permettre la retranslation."""
         card = QFrame()
         card.setObjectName("card")
         lay = QVBoxLayout(card)
@@ -163,7 +169,7 @@ class WelcomeView(QWidget):
         lay.addWidget(desc_lbl)
 
         lay.addStretch()
-        return card
+        return card, name_lbl, desc_lbl
 
     # ── Hooks ─────────────────────────────────
 
@@ -184,3 +190,10 @@ class WelcomeView(QWidget):
         self._btn_analyse.setText(tr("New analysis  →"))
         self._btn_demo.setText(tr("Try a demo scenario"))
         self._hint_lbl.setText(tr("TIP — Press") + "  Ctrl+K  " + tr("to open the command palette"))
+        self._caps_section_lbl.setText(tr("CAPABILITIES"))
+        # Retraduit les capability cards depuis leurs cles source
+        for (name_lbl, desc_lbl), (_, name_src, desc_src) in zip(
+            self._cap_widgets, self._capabilities_src
+        ):
+            name_lbl.setText(tr(name_src))
+            desc_lbl.setText(tr(desc_src))

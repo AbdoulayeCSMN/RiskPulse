@@ -12,7 +12,11 @@ from typing import Optional
 
 from fastapi import Header, HTTPException, status
 
-PREFS_PATH = Path("data") / "preferences.json"
+try:
+    from utils.paths import paths
+    PREFS_PATH = paths.preferences
+except Exception:
+    PREFS_PATH = Path("data") / "preferences.json"
 
 
 def _load_prefs() -> dict:

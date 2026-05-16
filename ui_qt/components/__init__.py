@@ -7,6 +7,10 @@ from .toast            import Toast, ToastManager
 from .command_palette  import CommandPalette, Command
 from .about_dialog     import AboutDialog
 from .splash           import SplashScreen
+from .login_dialog     import LoginDialog
+from .user_badge       import UserBadge
+from .update_dialog    import UpdateDialog
+from .activation_dialog import ActivationDialog
 
 __all__ = [
     "Card", "MetricCard", "Sidebar", "NavItem", "TopBar", "StatusBar",
@@ -14,4 +18,7 @@ __all__ = [
     "CommandPalette", "Command",
     "AboutDialog",
     "SplashScreen",
+    "LoginDialog", "UserBadge",
+    "UpdateDialog",
+    "ActivationDialog",
 ]

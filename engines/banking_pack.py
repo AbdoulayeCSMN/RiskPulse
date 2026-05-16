@@ -46,15 +46,18 @@ OFAC_SANCTIONS_COUNTRIES = {
     "crimea", "donetsk", "luhansk",
 }
 
-# Paradis fiscaux selon UE et listes connues
+# Paradis fiscaux / juridictions a haut risque (liste UE + listes connues)
+# Note : on N'INCLUT PAS la Suisse / le Luxembourg dans cette liste car ils sont
+# sortis des grey lists UE depuis 2019 et ne sont plus consideres comme paradis
+# fiscaux par les standards internationaux modernes. Les considerer comme tels
+# generait trop de false positives sur des dossiers bancaires europeens normaux.
 TAX_HAVENS = {
     "cayman islands", "iles caimans", "british virgin islands", "iles vierges",
     "bermuda", "bermudes", "panama", "bahamas", "vanuatu", "samoa",
     "marshall islands", "iles marshall", "anguilla", "barbados",
     "fiji", "fidji", "palau", "trinidad and tobago",
-    "luxembourg", "switzerland", "suisse",
     "monaco", "liechtenstein", "andorra", "andorre", "isle of man",
-    "jersey", "guernsey",
+    "jersey", "guernsey", "seychelles", "belize", "dominica",
 }
 
 # Top regulateurs financiers
@@ -433,6 +436,38 @@ class BankingAnalyzer:
                 "message": f"{th_n} entite(s) liee(s) a un paradis fiscal",
             })
 
+        # Termes-cles graves dans le texte global : escalation automatique
+        # Une mention explicite de "detournement", "evasion fiscale", "fraude
+        # comptable" doit elever le verdict, meme si pas d'entites flag-PEP/sanctions.
+        FRAUD_KEYWORDS = {
+            "detournement":       ("CLIENT_FUNDS_DIVERSION", "Detournement de fonds clients"),
+            "commingling":        ("CLIENT_FUNDS_DIVERSION", "Comingling of client funds"),
+            "evasion fiscale":    ("TAX_EVASION", "Schema d'evasion fiscale"),
+            "fraude comptable":   ("ACCOUNTING_FRAUD", "Fraude comptable"),
+            "accounting fraud":   ("ACCOUNTING_FRAUD", "Accounting fraud"),
+            "schema ponzi":       ("PONZI_SCHEME", "Schema Ponzi suspecte"),
+            "ponzi scheme":       ("PONZI_SCHEME", "Ponzi scheme suspected"),
+            "blanchiment":        ("MONEY_LAUNDERING", "Vocabulaire de blanchiment"),
+            "money laundering":   ("MONEY_LAUNDERING", "Money laundering vocabulary"),
+            "transferts suspects":("SUSPICIOUS_TRANSFERS", "Transferts suspects mentionnes"),
+            "suspicious transfer":("SUSPICIOUS_TRANSFERS", "Suspicious transfers mentioned"),
+            "depose le bilan":    ("BANKRUPTCY", "Defaillance / faillite mentionnee"),
+            "depot de bilan":     ("BANKRUPTCY", "Defaillance / faillite mentionnee"),
+            "filed for bankruptcy":("BANKRUPTCY", "Bankruptcy mentioned"),
+            "perte de confiance": ("CONFIDENCE_LOSS", "Perte de confiance des marches"),
+            "loss of confidence": ("CONFIDENCE_LOSS", "Loss of market confidence"),
+            "beneficiaire effectif": ("OPAQUE_OWNERSHIP", "Beneficial owner opacity"),
+            "beneficial owner":   ("OPAQUE_OWNERSHIP", "Beneficial owner opacity"),
+        }
+        text_low = self.text_full
+        for kw, (code, msg) in FRAUD_KEYWORDS.items():
+            if kw in text_low:
+                alerts.append({
+                    "code":     code,
+                    "severity": "high",
+                    "message":  msg,
+                })
+
         return alerts
 
     # ── Metriques sectorielles ──────────────
@@ -465,14 +500,26 @@ class BankingAnalyzer:
     def _summary(self, profiles, identifiers, alerts) -> dict:
         critical_p = [p for p in profiles if p.aml_verdict == "CRITICAL"]
         high_p = [p for p in profiles if p.aml_verdict == "HIGH"]
+        # Compte les alertes graves (high / critical)
+        critical_alerts = [a for a in alerts if a["severity"] == "critical"]
+        high_alerts = [a for a in alerts if a["severity"] == "high"]
+        # ── Verdict escalade ──
+        # Critical : sanctions, fraude comptable, Ponzi, money laundering explicite
+        # High     : 2+ alertes high (PEP, FATF concentration, tax haven multi)
+        # ou un single profile en HIGH/CRITICAL
+        if critical_p or critical_alerts:
+            verdict = "ESCALATION_REQUIRED"
+        elif high_p or len(high_alerts) >= 2:
+            verdict = "ENHANCED_DUE_DILIGENCE"
+        elif high_alerts:
+            verdict = "ENHANCED_DUE_DILIGENCE"
+        else:
+            verdict = "STANDARD_KYC"
+
         return {
-            "headline_alerts": len([a for a in alerts if a["severity"] in ("high", "critical")]),
+            "headline_alerts": len(critical_alerts) + len(high_alerts),
             "n_critical":     len(critical_p),
             "n_high":         len(high_p),
             "n_identifiers":  sum(len(v) for v in identifiers.values()),
-            "verdict":        (
-                "ESCALATION_REQUIRED" if critical_p or any(a["severity"] == "critical" for a in alerts)
-                else "ENHANCED_DUE_DILIGENCE" if high_p
-                else "STANDARD_KYC"
-            ),
+            "verdict":        verdict,
         }

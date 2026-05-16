@@ -1,0 +1,101 @@
+# Build + sign + publish a release when a tag v* is pushed.
+# Le code-signing requiert que tu mettes ton certificat .pfx dans les secrets
+# du repo : Settings -> Secrets -> Actions -> Add :
+#   - CERT_PFX_BASE64    : le contenu de cert.pfx encode base64
+#   - CERT_PASSWORD      : le mot de passe du .pfx
+# Si non configures, le job signe rien (release "unsigned").
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  windows-build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install build deps
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements.txt pyinstaller
+
+      - name: Download spaCy models
+        run: |
+          python -m spacy download fr_core_news_sm
+          python -m spacy download en_core_web_sm
+
+      - name: Compile translations
+        run: |
+          cd ui_qt/locales
+          python compile_qm.py
+
+      - name: Smoke test
+        run: python -m tests.smoke_test
+
+      - name: Decode signing certificate
+        if: env.CERT_PFX_BASE64 != ''
+        env:
+          CERT_PFX_BASE64: ${{ secrets.CERT_PFX_BASE64 }}
+        run: |
+          $bytes = [Convert]::FromBase64String($env:CERT_PFX_BASE64)
+          [IO.File]::WriteAllBytes("cert.pfx", $bytes)
+        shell: pwsh
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          $tag = $env:GITHUB_REF -replace 'refs/tags/v', ''
+          echo "version=$tag" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Run release pipeline
+        env:
+          CERT_FILE:     ${{ github.workspace }}/cert.pfx
+          CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
+        run: |
+          python build_scripts/release.py `
+            --version ${{ steps.version.outputs.version }} `
+            --notes-file CHANGELOG.md `
+            --base-url "https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}"
+        shell: pwsh
+
+      - name: Upload release artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/release/RiskPulse-*-portable.zip
+            dist/release/RiskPulse-*.sha256
+            dist/release/manifest.json
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: false
+
+      - name: Publish update manifest
+        # Publie le manifest.json sur la branche `gh-pages` pour que
+        # l'auto-updater puisse le recuperer.
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages || git checkout --orphan gh-pages
+          git checkout gh-pages
+          mkdir -p releases
+          cp dist/release/manifest.json releases/latest.json
+          git add releases/latest.json
+          git commit -m "Release v${{ steps.version.outputs.version }}"
+          git push origin gh-pages
+        shell: bash
+        continue-on-error: true

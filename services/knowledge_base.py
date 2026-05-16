@@ -25,7 +25,12 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-DB_PATH = Path("data") / "knowledge.db"
+try:
+    from utils.paths import paths
+    DB_PATH = paths.knowledge_db
+except Exception:
+    # Fallback si utils pas dispo (scripts standalone)
+    DB_PATH = Path("data") / "knowledge.db"
 
 
 # ─────────────────────────────────────────────
@@ -149,6 +154,37 @@ CREATE INDEX IF NOT EXISTS idx_alerts_seen ON alerts(seen);
 CREATE INDEX IF NOT EXISTS idx_alerts_ts ON alerts(timestamp);
 
 -- ─── Etape 3 : Enrichissement externe (Wikidata / Wikipedia) ───
+
+-- ─── Etape 7 : Multi-user + RBAC ───
+
+CREATE TABLE IF NOT EXISTS users (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    username      TEXT UNIQUE NOT NULL,
+    email         TEXT,
+    full_name     TEXT,
+    password_hash TEXT NOT NULL,
+    salt          TEXT NOT NULL,
+    role          TEXT NOT NULL DEFAULT 'viewer',
+    created_at    TEXT NOT NULL,
+    last_login    TEXT,
+    active        INTEGER NOT NULL DEFAULT 1
+);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+
+CREATE TABLE IF NOT EXISTS audit_log (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp     TEXT NOT NULL,
+    user_id       INTEGER,
+    username      TEXT,
+    action        TEXT NOT NULL,
+    resource_type TEXT,
+    resource_id   TEXT,
+    details       TEXT,
+    ip_address    TEXT,
+    success       INTEGER DEFAULT 1
+);
+CREATE INDEX IF NOT EXISTS idx_audit_ts ON audit_log(timestamp);
+CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_log(user_id);
 
 CREATE TABLE IF NOT EXISTS entity_enrichment (
     entity_id          INTEGER PRIMARY KEY,

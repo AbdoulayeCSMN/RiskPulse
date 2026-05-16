@@ -103,6 +103,18 @@ class APIServer:
             if self._server is not None:
                 logger.warning("API server already running")
                 return
+            # Licence : REST API necessite ENTERPRISE (ou trial)
+            try:
+                from services.licensing import get_license_manager
+                if not get_license_manager().can_use("rest_api"):
+                    raise PermissionError(
+                        "REST API requires an ENTERPRISE license. "
+                        "Activate one via Ctrl+L in the app."
+                    )
+            except PermissionError:
+                raise
+            except Exception as exc:
+                logger.warning("Licensing check failed, allowing start: %s", exc)
             app = create_app()
             config = uvicorn.Config(
                 app, host=self.host, port=self.port,

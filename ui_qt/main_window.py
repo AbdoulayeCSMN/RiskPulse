@@ -31,22 +31,42 @@ APP_VERSION = "1.0.0"
 
 def build_nav_items() -> list[NavItem]:
     """Items de navigation. Welcome est exclu - c'est l'ecran d'accueil non navigable."""
-    return [
+    # On filtre selon les permissions du user courant.
+    from services.permissions import PERM, can
+    items = [
         NavItem("analyse",       tr("Text Analysis")),
         NavItem("intelligence",  tr("Risk Intelligence")),
         NavItem("predictive",    tr("Predictive")),
         NavItem("banking",       tr("AML & Compliance")),
         NavItem("knowledge",     tr("Knowledge Base")),
         NavItem("monitoring",    tr("Watch & Monitor")),
-        NavItem("api",           tr("API & SDK")),
         NavItem("insights",      tr("AI Insights")),
         NavItem("propagation",   tr("Risk Propagation")),
         NavItem("comparaison",   tr("AI Comparison")),
         NavItem("contrefactuel", tr("What-If Simulations")),
         NavItem("traduction",    tr("Translation")),
         NavItem("dashboard",     tr("Dashboard")),
-        NavItem("parametres",    tr("Settings")),
     ]
+    # Sections admin-only
+    if can(PERM.MANAGE_API):
+        items.append(NavItem("api", tr("API & SDK")))
+    if can(PERM.MANAGE_USERS):
+        items.append(NavItem("users", tr("Users & Audit")))
+    items.append(NavItem("license",    tr("License")))
+    items.append(NavItem("telemetry",  tr("Diagnostics")))
+    items.append(NavItem("parametres", tr("Settings")))
+    return items
+
+
+# Feature gating : vue -> feature requise
+VIEW_FEATURE_MAP = {
+    "predictive":   "predictive",
+    "banking":      "banking_pack",
+    "insights":     "ai_insights",
+    "api":          "rest_api",
+    "users":        "multi_user",
+    "monitoring":   "watchlist",
+}
 
 
 # ─────────────────────────────────────────────
@@ -65,12 +85,21 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(APP_NAME)
         self.setMinimumSize(900, 600)
 
+        self._current_view = "welcome"
         self._build_ui()
         self._setup_toasts()
         self._setup_shortcuts()
         self._connect_signals()
         self._restore_state()
         self._setup_monitoring_timer()
+        self._setup_update_check()
+        try:
+            from services.telemetry import get_telemetry
+            t = get_telemetry()
+            t.set_app_version(APP_VERSION)
+            t.event("app_start", {"version": APP_VERSION})
+        except Exception:
+            pass
 
     # ── Construction UI ───────────────────────
 
@@ -129,6 +158,7 @@ class MainWindow(QMainWindow):
         from .views.knowledge_view     import KnowledgeView
         from .views.monitoring_view    import MonitoringView
         from .views.api_view           import ApiView
+        from .views.users_view         import UsersView
         from .views.insights_view      import InsightsView
         from .views.propagation_view   import PropagationView
         from .views.comparaison_view   import ComparaisonView
@@ -136,6 +166,8 @@ class MainWindow(QMainWindow):
         from .views.traduction_view    import TraductionView
         from .views.dashboard_view     import DashboardView
         from .views.parametres_view    import ParametresView
+        from .views.license_view       import LicenseView
+        from .views.telemetry_view     import TelemetryView
 
         # Welcome en premier — pas dans la sidebar mais dans le stack
         welcome = WelcomeView(controller=self.controller, app=self)
@@ -151,6 +183,7 @@ class MainWindow(QMainWindow):
             "knowledge":     KnowledgeView,
             "monitoring":    MonitoringView,
             "api":           ApiView,
+            "users":         UsersView,
             "insights":      InsightsView,
             "propagation":   PropagationView,
             "comparaison":   ComparaisonView,
@@ -158,6 +191,8 @@ class MainWindow(QMainWindow):
             "traduction":    TraductionView,
             "dashboard":     DashboardView,
             "parametres":    ParametresView,
+            "license":       LicenseView,
+            "telemetry":     TelemetryView,
         }
         for vid in [item.id for item in build_nav_items()]:
             ViewClass = view_classes.get(vid)
@@ -203,6 +238,18 @@ class MainWindow(QMainWindow):
 
     def toast(self, message: str, level: str = "info"):
         self.toasts.show(message, level)
+
+    # ── Update check au boot ──────────────────
+
+    def _setup_update_check(self):
+        """Check silencieux 10s apres le boot, puis toutes les 6h."""
+        from PySide6.QtCore import QTimer
+        # Premier check apres 10s
+        QTimer.singleShot(10 * 1000, lambda: self.check_updates(silent=True))
+        # Rappel toutes les 6 heures
+        self._update_timer = QTimer(self)
+        self._update_timer.timeout.connect(lambda: self.check_updates(silent=True))
+        self._update_timer.start(6 * 60 * 60 * 1000)
 
     # ── Monitoring auto (timer) ───────────────
 
@@ -289,6 +336,10 @@ class MainWindow(QMainWindow):
         QShortcut(QKeySequence("F1"), self, activated=self._open_about)
         # Ctrl+Q = quit
         QShortcut(QKeySequence("Ctrl+Q"), self, activated=self.close)
+        # Ctrl+U = check updates
+        QShortcut(QKeySequence("Ctrl+U"), self, activated=self.check_updates)
+        # Ctrl+L = license view
+        QShortcut(QKeySequence("Ctrl+L"), self, activated=lambda: self._navigate("license"))
 
     # ── Command palette ───────────────────────
 
@@ -349,18 +400,84 @@ class MainWindow(QMainWindow):
         dlg = AboutDialog(parent=self)
         dlg.exec()
 
+    # ── Updates ───────────────────────────────
+
+    def check_updates(self, silent: bool = False):
+        """
+        Ouvre le dialogue d'update. Si silent=True, on check d'abord en arriere
+        plan et on n'affiche le dialog QUE si une update est disponible.
+        """
+        from .components.update_dialog import UpdateDialog
+        from services.updater import get_updater
+
+        if not silent:
+            dlg = UpdateDialog(current_version=APP_VERSION, parent=self, auto_check=True)
+            dlg.exec()
+            return
+
+        # Mode silent : thread d'arriere plan
+        import threading
+        def _job():
+            try:
+                info = get_updater(APP_VERSION).check(timeout=5)
+                if info.available:
+                    from PySide6.QtCore import QMetaObject, Qt as _Qt
+                    QMetaObject.invokeMethod(self, "_on_silent_update_found",
+                                              _Qt.QueuedConnection)
+            except Exception:
+                pass
+        threading.Thread(target=_job, daemon=True).start()
+
+    def _on_silent_update_found(self):
+        """Callback thread-safe quand un update est detecte en arriere plan."""
+        self.toast(tr("A new version is available — press Ctrl+U"), "info")
+
     # ── Signaux ───────────────────────────────
 
     def _connect_signals(self):
         self.sidebar.navigate.connect(self._navigate)
         self.topbar.theme_toggled.connect(self._toggle_theme)
         self.topbar.language_changed.connect(self._on_language_changed)
+        self.topbar.logout_requested.connect(self._on_logout)
         self.i18n.language_changed.connect(self._retranslate)
         self.tm.theme_changed.connect(lambda _: self.topbar.update_theme_icon(self.tm.is_dark))
+
+        # Affiche le badge user dans la topbar
+        try:
+            from services.auth_service import get_auth
+            user = get_auth().current_user
+            if user:
+                self.topbar.set_user(user)
+        except Exception:
+            pass
+
+    def _on_logout(self):
+        """Sign out + re-affichage du login."""
+        try:
+            from services.auth_service import get_auth
+            get_auth().logout()
+        except Exception:
+            pass
+        self.toast(tr("Signed out"), "info")
+        # On ferme la fenetre — main_qt.py re-affiche le login
+        self.close()
 
     def _navigate(self, view_id: str):
         if view_id not in self._views:
             return
+        # Feature gating : verifie le plan avant de basculer sur une vue premium
+        feature = VIEW_FEATURE_MAP.get(view_id)
+        if feature:
+            from services.licensing import get_license_manager
+            mgr = get_license_manager()
+            if not mgr.can_use(feature):
+                required = mgr.required_plan(feature).value
+                self.toast(
+                    f"{tr('This feature requires the')} {required} {tr('plan')}",
+                    "warning",
+                )
+                # Redirige vers la vue License pour activer
+                view_id = "license"
         idx = self._view_order.index(view_id)
         self.stack.setCurrentIndex(idx)
         # La sidebar n'a pas welcome
@@ -373,6 +490,12 @@ class MainWindow(QMainWindow):
         view = self._views.get(view_id)
         if view and hasattr(view, "on_show"):
             view.on_show()
+        self._current_view = view_id
+        try:
+            from services.telemetry import get_telemetry
+            get_telemetry().view_shown(view_id)
+        except Exception:
+            pass
 
     def _toggle_theme(self):
         self.tm.toggle()
@@ -383,6 +506,8 @@ class MainWindow(QMainWindow):
 
     def _retranslate(self, _code: str):
         self.topbar.set_subtitle(tr("AI-powered risk mapping and propagation"))
+        # Synchronise le selecteur de langue de la topbar
+        self.topbar.set_language(_code)
         new_labels = {item.id: item.label for item in build_nav_items()}
         self.sidebar.update_labels(new_labels)
         self.sidebar.set_section_label(tr("NAVIGATION"))
@@ -443,6 +568,11 @@ class MainWindow(QMainWindow):
             self._navigate("welcome")
 
     def closeEvent(self, event):
+        try:
+            from services.telemetry import get_telemetry
+            get_telemetry().event("app_quit")
+        except Exception:
+            pass
         self.settings.setValue("window/geometry", self.saveGeometry())
         self.settings.setValue("ui/theme",  self.tm.name)
         self.settings.setValue("ui/last_view",

@@ -28,7 +28,12 @@ SUPPORTED_LANGUAGES = {
 }
 
 DEFAULT_LANGUAGE = "en"   # Fallback international
-PREFS_PATH = Path("data") / "preferences.json"
+
+try:
+    from utils.paths import paths as _paths
+    PREFS_PATH = _paths.preferences
+except Exception:
+    PREFS_PATH = Path("data") / "preferences.json"
 
 
 class I18nManager(QObject):
@@ -99,8 +104,10 @@ class I18nManager(QObject):
         self._app.removeTranslator(self._translator)
         self._translator = QTranslator()
 
-        # Charge le nouveau .qm
-        qm_path = Path(__file__).parent / "locales" / f"riskpulse_{code}.qm"
+        # Charge le nouveau .qm.
+        # En mode frozen (exe), les .qm sont dans le bundle PyInstaller,
+        # qui peut etre soit a cote de l'exe, soit dans _MEIPASS.
+        qm_path = self._locate_qm(code)
         if qm_path.exists():
             if self._translator.load(str(qm_path)):
                 self._app.installTranslator(self._translator)
@@ -113,6 +120,15 @@ class I18nManager(QObject):
 
         self._current_lang = code
         self._save_preference(code)
+
+        # ── RTL pour l'arabe ──
+        try:
+            from PySide6.QtCore import Qt
+            direction = Qt.RightToLeft if code == "ar" else Qt.LeftToRight
+            self._app.setLayoutDirection(direction)
+        except Exception:
+            pass
+
         if notify:
             self.language_changed.emit(code)
 
@@ -123,6 +139,28 @@ class I18nManager(QObject):
     @property
     def is_rtl(self) -> bool:
         return self._current_lang == "ar"
+
+    def _locate_qm(self, code: str) -> Path:
+        """Trouve le .qm dans tous les emplacements possibles (dev + frozen)."""
+        candidates = [
+            Path(__file__).parent / "locales" / f"riskpulse_{code}.qm",
+        ]
+        # Mode frozen : essaie via utils.paths.resource
+        try:
+            from utils.paths import paths
+            candidates.append(
+                paths.resource("ui_qt", "locales", f"riskpulse_{code}.qm")
+            )
+            candidates.append(
+                paths.resource("locales", f"riskpulse_{code}.qm")
+            )
+        except Exception:
+            pass
+        for c in candidates:
+            if c.exists():
+                return c
+        # Retourne le 1er candidat (qui n'existe pas) pour le message d'erreur
+        return candidates[0]
 
     # ── Persistance ─────────────────────────────
 
@@ -149,12 +187,12 @@ class I18nManager(QObject):
             logger.warning(f"Sauvegarde prefs echouee : {e}")
 
 
-def tr(text: str, context: str = "RiskPulse") -> str:
+def tr(text: str, context: str = "") -> str:
     """
     Helper de traduction : QCoreApplication.translate.
-    Utilise dans le code : tr("Analyse de Texte") -> traduit selon langue active.
 
-    Les chaines source sont en ANGLAIS dans le code (convention Qt).
-    Les .ts contiennent la traduction vers fr/ar/it/es/en (en si differente).
+    Important : on utilise un contexte VIDE par defaut car pyside6-lupdate
+    extrait nos `tr(...)` (appels de fonction libres, hors classe QObject)
+    sous un <name /> vide. Le contexte doit donc correspondre.
     """
     return QCoreApplication.translate(context, text)

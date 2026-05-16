@@ -73,6 +73,19 @@ class AnalyseView(QWidget):
         self._analysis = None
         self._graph_html = None
         self._build()
+        self._apply_permissions()
+
+    def _apply_permissions(self):
+        """Greise les boutons selon les permissions du user courant."""
+        try:
+            from services.permissions import PERM, can
+            self._btn_analyse.setEnabled(can(PERM.RUN_ANALYSIS))
+            self._btn_demo.setEnabled(can(PERM.RUN_DEMO))
+            self._btn_import.setEnabled(can(PERM.RUN_ANALYSIS))
+            if not can(PERM.RUN_ANALYSIS):
+                self._btn_analyse.setToolTip(tr("Read-only role — analysis disabled"))
+        except Exception:
+            pass
 
         # Connecte les signaux aux slots UI (Qt::AutoConnection = queue si thread different)
         self._analysis_done.connect(self._on_done)

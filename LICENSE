@@ -1,0 +1,74 @@
+PROPRIETARY SOFTWARE LICENSE
+
+Copyright (c) 2026 C. Abdoulaye
+
+All rights reserved.
+
+This software ("RiskPulse") and its source code, documentation, and
+associated assets (collectively, the "Software") are the proprietary
+property of C. Abdoulaye ("Licensor").
+
+PERMITTED USE
+
+Subject to the terms of this license, Licensor grants you a non-
+exclusive, non-transferable, revocable license to:
+
+  1. Install and run one (1) copy of the Software on a personal
+     workstation, for evaluation or internal business use.
+
+  2. Generate reports and analyses for your own internal purposes
+     using the Software's features.
+
+RESTRICTIONS
+
+You may NOT:
+
+  1. Modify, decompile, reverse-engineer, or disassemble the Software,
+     except as expressly permitted by applicable law.
+
+  2. Redistribute, sub-license, rent, lease, sell, resell, or otherwise
+     transfer the Software to any third party.
+
+  3. Remove or alter any proprietary notices, labels, or watermarks
+     present in the Software, reports, or output.
+
+  4. Use the Software to compete with the Licensor's business or to
+     train any machine learning model that competes with RiskPulse.
+
+THIRD-PARTY COMPONENTS
+
+The Software incorporates open-source components subject to their own
+licenses (PySide6 LGPL, spaCy MIT, FastAPI MIT, etc.). See `NOTICE.md`
+in the installation directory for a full list of components and their
+respective licenses.
+
+DISCLAIMER
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. THE SOFTWARE
+IS A DECISION-SUPPORT TOOL AND DOES NOT REPLACE PROFESSIONAL JUDGMENT
+IN MATTERS OF FINANCIAL, LEGAL, OR REGULATORY COMPLIANCE. IN PARTICULAR,
+ANY AML / KYC / SANCTIONS OUTPUT MUST BE REVIEWED BY A QUALIFIED HUMAN
+ANALYST BEFORE BEING ACTED UPON.
+
+LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+TERMINATION
+
+This license terminates automatically if you breach any of its terms.
+Upon termination, you must delete all copies of the Software in your
+possession.
+
+GOVERNING LAW
+
+This license is governed by the laws of Morocco. Any dispute arising
+from this license shall be submitted to the competent courts of
+Casablanca.
+
+Contact : contact@riskpulse.io

@@ -273,7 +273,7 @@ class RiskController:
             analysis_id = kb.save_analysis(self.current_analysis, text)
             self.current_analysis["kb_id"] = analysis_id
         except Exception as e:
-            logger.warning(f"KB save failed: {e}")
+            logger.warning(f"KB save failed: {e}", exc_info=True)
 
         self._log("analyze", f"Analyse terminée en {total_time}s — "
                              f"{nlp_result['stats'].get('nb_entities', 0)} entités, "
